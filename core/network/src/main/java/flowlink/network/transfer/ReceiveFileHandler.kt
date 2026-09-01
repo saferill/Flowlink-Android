@@ -190,7 +190,9 @@ class ReceiveFileHandler(
 
     private suspend fun createOutputUri(metadata: FileMetadata): Uri {
         return if (isSilent) {
-            createTempFileUri(context, metadata.fileName)
+            val extension = metadata.fileName.substringAfterLast('.', "")
+            val prefix = metadata.fileName.substringBeforeLast('.')
+            createTempFileUri(context, prefix.ifEmpty { "temp" }, extension)
         } else {
             val uniqueName = getUniqueFileName(metadata.fileName)
             
