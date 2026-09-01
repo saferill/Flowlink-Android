@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowLink - System Architecture & Live Motion Flow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090a0f;
+      --card-bg: rgba(20, 24, 38, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-blue: #00d2ff;
+      --accent-purple: #9d4edd;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 210, 255, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(157, 78, 221, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      background: rgba(9, 10, 15, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #262424, #181616);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+    }
+
+    .logo-badge svg {
+      width: 26px;
+      height: 26px;
+      fill: #ffffff;
+    }
+
+    .brand-title h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #00d2ff, #9d4edd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .controls-panel {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00d2ff, #0077ff);
+      color: #000;
+      border: none;
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Main Canvas Area */
+    main {
+      flex: 1;
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .hero-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px 32px;
+      backdrop-filter: blur(16px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-text h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-text p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .sim-bar {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sim-btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .sim-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .sim-btn.active {
+      border-color: var(--accent-blue);
+      background: rgba(0, 210, 255, 0.15);
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+    }
+
+    /* Architecture Visualizer Grid */
+    .diagram-container {
+      position: relative;
+      background: rgba(13, 16, 28, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* SVG Canvas Overlay */
+    #flowSvg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .node-card {
+      position: relative;
+      z-index: 2;
+      width: 320px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .node-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 210, 255, 0.4);
+      box-shadow: 0 20px 50px rgba(0, 210, 255, 0.15);
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .node-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .android-icon {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-green);
+    }
+
+    .desktop-icon {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.2), rgba(0, 119, 255, 0.05));
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      color: var(--accent-blue);
+    }
+
+    .mesh-icon {
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(157, 78, 221, 0.05));
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      color: var(--accent-purple);
+    }
+
+    .node-title h3 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .node-title span {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: all 0.2s ease;
+    }
+
+    .feature-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .status-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-blue {
+      background: rgba(0, 210, 255, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+    }
+
+    .badge-purple {
+      background: rgba(157, 78, 221, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+    }
+
+    /* Central Bridge Card */
+    .bridge-node {
+      width: 280px;
+      text-align: center;
+    }
+
+    .bridge-meter {
+      margin-top: 14px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .meter-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 85%;
+      background: linear-gradient(90deg, #00d2ff, #10b981);
+      border-radius: 4px;
+      animation: pulseWidth 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseWidth {
+      0%, 100% { width: 75%; }
+      50% { width: 95%; }
+    }
+
+    /* Live Log Monitor */
+    .log-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      backdrop-filter: blur(16px);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .log-screen {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 14px 18px;
+      height: 120px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 12px;
+    }
+
+    .log-time {
+      color: var(--text-muted);
+    }
+
+    .log-msg-success { color: var(--accent-green); }
+    .log-msg-info { color: var(--accent-blue); }
+    .log-msg-action { color: var(--accent-amber); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="logo-badge">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-6h2v6zm0-8h-2V7h2v1z"/>
+        </svg>
+      </div>
+      <div class="brand-title">
+        <h1>FlowLink</h1>
+        <p>System Architecture & Interactive Flow Simulator</p>
+      </div>
+    </div>
+    <div class="controls-panel">
+      <button class="btn btn-secondary" onclick="resetSim()">↺ Reset Stream</button>
+      <button class="btn btn-primary" onclick="window.print()">📷 Export PNG / PDF</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Simulator Interactive Controls -->
+    <div class="hero-panel">
+      <div class="hero-text">
+        <h2>Live Protocol Simulation</h2>
+        <p>Trigger live signal waveforms and data packets across the TLS encrypted mesh.</p>
+      </div>
+      <div class="sim-bar">
+        <button class="sim-btn" onclick="sendSignal('photo')">📸 Send Photo (64KB)</button>
+        <button class="sim-btn" onclick="sendSignal('video')">🎬 Send 4K Video (4MB)</button>
+        <button class="sim-btn" onclick="sendSignal('lock')">🔒 Lock PC</button>
+        <button class="sim-btn" onclick="sendSignal('close_all')">🛑 Close All Apps</button>
+        <button class="sim-btn" onclick="sendSignal('shutdown')">⚡ Shutdown PC</button>
+      </div>
+    </div>
+
+    <!-- Interactive Node Diagram -->
+    <div class="diagram-container" id="diagramContainer">
+      <svg id="flowSvg">
+        <defs>
+          <linearGradient id="gradFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#10b981" />
+            <stop offset="50%" stop-color="#00d2ff" />
+            <stop offset="100%" stop-color="#9d4edd" />
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
+        <!-- Base Circuit Lines -->
+        <path id="pathLeft" d="M 330 260 L 530 260" stroke="rgba(255, 255, 255, 0.1)" stroke-width="3" stroke-dasharray="6,6" fill="none"/>
+        <path id="pathRight" d="M 810 260 L 1010 260" stroke="rgba(255, 255, 255, 0.1)" stroke-width="3" stroke-dasharray="6,6" fill="none"/>
+
+        <!-- Animated Pulse Circle Container -->
+        <g id="pulseGroup"></g>
+      </svg>
+
+      <!-- 1. ANDROID NODE -->
+      <div class="node-card" id="androidNode">
+        <div class="node-header">
+          <div class="node-icon android-icon">📱</div>
+          <div class="node-title">
+            <h3>FlowLink Android</h3>
+            <span>Kotlin & Compose UI</span>
+          </div>
+        </div>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span>Tailscale & LAN Discovery</span>
+            <span class="status-badge badge-green">100.64.0.0/10</span>
+          </div>
+          <div class="feature-item">
+            <span>Adaptive Buffer Engine</span>
+            <span class="status-badge badge-green">64KB – 4MB</span>
+          </div>
+          <div class="feature-item">
+            <span>Device Control Card</span>
+            <span class="status-badge badge-green">Lock / Close / Off</span>
+          </div>
+          <div class="feature-item">
+            <span>Ktor TLS Client</span>
+            <span class="status-badge badge-green">Port 5149–5169</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. TAILSCALE & TLS ENCRYPTED MESH -->
+      <div class="node-card bridge-node" id="bridgeNode">
+        <div class="node-header" style="justify-content: center;">
+          <div class="node-icon mesh-icon">⚡</div>
+        </div>
+        <div class="node-title">
+          <h3>Encrypted Mesh Tunnel</h3>
+          <span>TLS 1.3 / WireGuard / Direct LAN</span>
+        </div>
+        <div class="bridge-meter">
+          <div class="meter-label">
+            <span>TCP NODELAY</span>
+            <span>0 ms LAG</span>
+          </div>
+          <div class="meter-bar">
+            <div class="meter-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. WINDOWS DESKTOP NODE -->
+      <div class="node-card" id="desktopNode">
+        <div class="node-header">
+          <div class="node-icon desktop-icon">🖥️</div>
+          <div class="node-title">
+            <h3>FlowLink Desktop</h3>
+            <span>WinUI 3 & .NET 9</span>
+          </div>
+        </div>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span>System Tray Autostart</span>
+            <span class="status-badge badge-blue">Silent Boot</span>
+          </div>
+          <div class="feature-item">
+            <span>Fast Tailscale Polling</span>
+            <span class="status-badge badge-blue">Adaptive 3s</span>
+          </div>
+          <div class="feature-item">
+            <span>Win32 Native Actions</span>
+            <span class="status-badge badge-blue">Lock / EnumWindows</span>
+          </div>
+          <div class="feature-item">
+            <span>Explorer Context Menu</span>
+            <span class="status-badge badge-blue">Right Click Send</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Console Log Monitor -->
+    <div class="log-panel">
+      <div class="log-header">
+        <span>LIVE TELEMETRY LOGS</span>
+        <span id="logStatus" style="color: var(--accent-green);">● LINK ACTIVE</span>
+      </div>
+      <div class="log-screen" id="logScreen">
+        <div class="log-entry">
+          <span class="log-time">[SYSTEM]</span>
+          <span class="log-msg-success">FlowLink Mesh Initialized (TLS Port 5149 Bound, Fast Polling active).</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function addLog(msg, type = 'info') {
+      const screen = document.getElementById('logScreen');
+      const time = new Date().toTimeString().split(' ')[0];
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      
+      let classType = 'log-msg-info';
+      if (type === 'success') classType = 'log-msg-success';
+      if (type === 'action') classType = 'log-msg-action';
+
+      entry.innerHTML = `<span class="log-time">[${time}]</span><span class="${classType}">${msg}</span>`;
+      screen.appendChild(entry);
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    function sendSignal(type) {
+      const pulseGroup = document.getElementById('pulseGroup');
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      
+      let color = '#00d2ff';
+      let radius = 6;
+      let label = '';
+
+      if (type === 'photo') {
+        color = '#10b981';
+        radius = 7;
+        label = 'Photo (64KB adaptive burst) sent from Android to Desktop.';
+        addLog(label, 'success');
+      } else if (type === 'video') {
+        color = '#00d2ff';
+        radius = 12;
+        label = '4K Video (4MB mega-chunks) streaming over 2MB socket window at wire-speed.';
+        addLog(label, 'info');
+      } else if (type === 'lock') {
+        color = '#f59e0b';
+        radius = 8;
+        label = 'Action Signal: LockWorkStation() dispatched -> Desktop Screen Locked (0ms).';
+        addLog(label, 'action');
+      } else if (type === 'close_all') {
+        color = '#ef4444';
+        radius = 9;
+        label = 'Action Signal: CloseAllUserWindows() -> Sent WM_CLOSE to all running apps & tabs.';
+        addLog(label, 'action');
+      } else if (type === 'shutdown') {
+        color = '#ef4444';
+        radius = 10;
+        label = 'Action Signal: Executing shutdown.exe /s /t 0 /f -> PC Shutting Down.';
+        addLog(label, 'action');
+      }
+
+      circle.setAttribute('r', radius);
+      circle.setAttribute('fill', color);
+      circle.setAttribute('filter', 'url(#glow)');
+      pulseGroup.appendChild(circle);
+
+      // Animate packet along path
+      let progress = 0;
+      const startX = 330;
+      const endX = 1010;
+      const y = 260;
+
+      const anim = setInterval(() => {
+        progress += 0.035;
+        const currentX = startX + (endX - startX) * progress;
+        circle.setAttribute('cx', currentX);
+        circle.setAttribute('cy', y);
+
+        if (progress >= 1) {
+          clearInterval(anim);
+          pulseGroup.removeChild(circle);
+          highlightNode('desktopNode');
+        }
+      }, 16);
+    }
+
+    function highlightNode(id) {
+      const el = document.getElementById(id);
+      el.style.transform = 'scale(1.03)';
+      el.style.borderColor = 'var(--accent-blue)';
+      setTimeout(() => {
+        el.style.transform = '';
+        el.style.borderColor = '';
+      }, 300);
+    }
+
+    function resetSim() {
+      document.getElementById('logScreen').innerHTML = '';
+      addLog('Stream and log history reset.', 'info');
+    }
+
+    // Auto-pulse telemetry heartbeat
+    setInterval(() => {
+      const pulseGroup = document.getElementById('pulseGroup');
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('r', '4');
+      circle.setAttribute('fill', '#9d4edd');
+      circle.setAttribute('filter', 'url(#glow)');
+      pulseGroup.appendChild(circle);
+
+      let progress = 0;
+      const startX = 1010;
+      const endX = 330;
+      const y = 260;
+
+      const anim = setInterval(() => {
+        progress += 0.02;
+        const currentX = startX + (endX - startX) * progress;
+        circle.setAttribute('cx', currentX);
+        circle.setAttribute('cy', y);
+
+        if (progress >= 1) {
+          clearInterval(anim);
+          pulseGroup.removeChild(circle);
+        }
+      }, 20);
+    }, 4000);
+  </script>
+</body>
+</html>
