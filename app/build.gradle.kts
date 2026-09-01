@@ -1,0 +1,102 @@
+plugins {
+    alias(libs.plugins.flowlink.android.application)
+    alias(libs.plugins.compose.compiler)
+}
+
+android {
+    namespace = "com.castle.FlowLink"
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+
+    defaultConfig {
+        applicationId = "com.castle.FlowLink"
+
+        versionCode = 27
+        versionName = "2.4.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1,DEPENDENCIES}"
+            excludes += "META-INF/versions/**"
+        }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
+            "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=kotlinx.coroutines.FlowPreview",
+        )
+    }
+}
+
+
+dependencies {
+    api(projects.core.common)
+    api(projects.core.network)
+    api(projects.core.presentation)
+    api(projects.data)
+    api(projects.domain)
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.work)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose.android)
+    implementation(libs.material3.adaptive.navigation.suite)
+    implementation(libs.coil.compose)
+    implementation(libs.compose.navigation)
+    implementation(libs.splashscreen)
+
+    implementation(libs.richtext.m3)
+    implementation(libs.richtext.commonmark)
+    implementation(libs.reorderable)
+
+    implementation(libs.androidx.media)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.zxing.cpp.android)
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+    implementation(libs.guava)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+}

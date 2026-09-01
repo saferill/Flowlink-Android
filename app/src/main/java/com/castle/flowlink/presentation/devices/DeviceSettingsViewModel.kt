@@ -1,0 +1,223 @@
+package com.castle.FlowLink.presentation.devices
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import com.komu.sekia.di.AppCoroutineScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import FlowLink.clipboard.ClipboardListener
+import FlowLink.common.util.PermissionStates
+import FlowLink.common.util.checkNotificationPermission
+import FlowLink.common.util.checkStoragePermission
+import FlowLink.common.util.isAccessibilityServiceEnabled
+import FlowLink.common.util.isNotificationListenerEnabled
+import FlowLink.common.util.phoneStatePermissionGranted
+import FlowLink.common.util.smsPermissionGranted
+import FlowLink.domain.model.AddressEntry
+import FlowLink.domain.model.PairedDevice
+import FlowLink.domain.model.DevicePreferences
+import FlowLink.domain.interfaces.DeviceManager
+import FlowLink.domain.interfaces.NetworkManager
+import FlowLink.domain.interfaces.PreferencesRepository
+import javax.inject.Inject
+
+@HiltViewModel
+class DeviceSettingsViewModel @Inject constructor(
+    private val deviceManager: DeviceManager,
+    private val networkManager: NetworkManager,
+    private val preferencesRepository: PreferencesRepository,
+    private val appScope: AppCoroutineScope,
+    savedStateHandle: SavedStateHandle,
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val deviceId: String = checkNotNull(savedStateHandle["deviceId"])
+
+    private val _device = MutableStateFlow<PairedDevice?>(null)
+    val device: StateFlow<PairedDevice?> = _device.asStateFlow()
+
+    // Permission states
+    private val _permissionStates = MutableStateFlow(PermissionStates())
+    val permissionStates: StateFlow<PermissionStates> = _permissionStates.asStateFlow()
+
+    val context = getApplication<Application>()
+
+    // Device-specific settings
+    val preferences: StateFlow<DevicePreferences> = preferencesRepository
+        .preferenceSettings(deviceId)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DevicePreferences())
+
+    init {
+        updatePermissionStates()
+        viewModelScope.launch {
+            deviceManager.pairedDevices.collectLatest { devices ->
+                _device.value = devices.firstOrNull { it.deviceId == deviceId }
+            }
+        }
+    }
+
+    fun updatePermissionStates() {
+        val newStates = PermissionStates(
+            notificationGranted = checkNotificationPermission(context),
+            batteryGranted = false, // Not needed
+            locationGranted = false, // Not needed
+            storageGranted = checkStoragePermission(context),
+            accessibilityGranted = isAccessibilityServiceEnabled(context, "${context.packageName}/${ClipboardListener::class.java.canonicalName}"),
+            notificationListenerGranted = isNotificationListenerEnabled(context),
+            smsPermissionGranted = smsPermissionGranted(context),
+            phoneStateGranted = phoneStatePermissionGranted(context)
+        )
+        _permissionStates.value = newStates
+    }
+
+    fun toggleIpEnabled(address: String) {
+        viewModelScope.launch {
+            _device.value?.let { currentDevice ->
+                val updatedIps = currentDevice.addresses.map { entry ->
+                    if (entry.address == address) entry.copy(isEnabled = !entry.isEnabled)
+                    else entry
+                }
+                val updatedDevice = currentDevice.copy(addresses = updatedIps)
+                deviceManager.addOrUpdatePairedDevice(updatedDevice)
+            }
+        }
+    }
+
+    fun updateIpPriority(address: String, newPriority: Int) {
+        viewModelScope.launch {
+            _device.value?.let { currentDevice ->
+                // Reorder all entries based on their current visual order
+                val sortedAddresses = currentDevice.addresses.sortedBy { it.priority }.toMutableList()
+                val itemIndex = sortedAddresses.indexOfFirst { it.address == address }
+                
+                if (itemIndex != -1 && itemIndex != newPriority) {
+                    val item = sortedAddresses.removeAt(itemIndex)
+                    sortedAddresses.add(newPriority.coerceIn(0, sortedAddresses.size), item)
+                    
+                    // Reassign priorities based on new order
+                    val updatedIps = sortedAddresses.mapIndexed { index, entry ->
+                        entry.copy(priority = index)
+                    }
+                    
+                    val updatedDevice = currentDevice.copy(addresses = updatedIps)
+                    deviceManager.addOrUpdatePairedDevice(updatedDevice)
+                }
+            }
+        }
+    }
+
+    fun addCustomIp(ip: String) {
+        viewModelScope.launch {
+            _device.value?.let { currentDevice ->
+                val trimmedIp = ip.trim()
+                if (trimmedIp.isNotBlank() && currentDevice.addresses.none { it.address == trimmedIp }) {
+                    val newEntry = AddressEntry(trimmedIp, isEnabled = true, priority = currentDevice.addresses.size)
+                    val updatedDevice = currentDevice.copy(addresses = currentDevice.addresses + newEntry)
+                    deviceManager.addOrUpdatePairedDevice(updatedDevice)
+                }
+            }
+        }
+    }
+
+    fun removeDevice() {
+        appScope.launch {
+            networkManager.disconnect(deviceId)
+            deviceManager.removePairedDevice(deviceId)
+        }
+    }
+
+    fun removeIp(address: String) {
+        viewModelScope.launch {
+            _device.value?.let { currentDevice ->
+                val updatedIps = currentDevice.addresses.filter { it.address != address }
+                val updatedDevice = currentDevice.copy(addresses = updatedIps)
+                deviceManager.addOrUpdatePairedDevice(updatedDevice)
+            }
+        }
+    }
+
+    fun saveClipboardSyncSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveClipboardSyncSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveMessageSyncSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveMessageSyncSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveNotificationSyncSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveNotificationSyncSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveImageClipboardSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveImageClipboardSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveMediaSessionSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveMediaSessionSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveMediaSessionNotificationSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveMediaSessionNotificationSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveRemoteVolumeControlSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveRemoteVolumeControlSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveMediaPlayerControlSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveMediaPlayerControlSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveRemoteStorageSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveRemoteStorageSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveCallStateSyncSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveCallStateSyncSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun saveCallLogSyncSettings(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.saveCallLogSyncSettingsForDevice(deviceId, enabled)
+        }
+    }
+
+    fun hasRequestedPermission(permission: String): Flow<Boolean> {
+        return preferencesRepository.hasRequestedPermission(permission)
+    }
+
+    fun savePermissionRequested(permission: String) {
+        viewModelScope.launch {
+            preferencesRepository.savePermissionRequested(permission)
+        }
+    }
+}

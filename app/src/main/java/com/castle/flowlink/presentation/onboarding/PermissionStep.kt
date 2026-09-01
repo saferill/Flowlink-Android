@@ -1,0 +1,497 @@
+package com.castle.FlowLink.presentation.onboarding
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.net.toUri
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.castle.FlowLink.presentation.common.components.LocationPermissionRationaleDialog
+import com.castle.FlowLink.presentation.settings.SettingsViewModel
+import FlowLink.common.R
+import FlowLink.common.util.NEARBY_DEVICES_PERMISSIONS
+import FlowLink.common.util.openAppSettings
+import FlowLink.presentation.components.padding
+
+internal class PermissionStep : OnboardingStep {
+    @Composable
+    override fun Content(viewModel: SettingsViewModel) {
+        val context = LocalContext.current
+        val lifecycleOwner = LocalLifecycleOwner.current
+
+        val permissionStates by viewModel.permissionStates.collectAsState()
+
+        var permissionRationaleDialog by remember {
+            mutableStateOf<PermissionRationaleDialog?>(null)
+        }
+        var showLocationRationaleDialog by remember { mutableStateOf(false) }
+
+        val backgroundLocationRequester = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { /* handled in onResume */ }
+        )
+        val foregroundLocationRequester = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+            onResult = { permissions ->
+                val isForegroundGranted = permissions.entries.all { it.value }
+                if (isForegroundGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    backgroundLocationRequester.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                }
+            }
+        )
+
+        // Update permissions on resume
+        DisposableEffect(lifecycleOwner.lifecycle) {
+            val observer = object : DefaultLifecycleObserver {
+                override fun onResume(owner: LifecycleOwner) {
+                    viewModel.updatePermissionStates()
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = MaterialTheme.padding.medium)
+                .verticalScroll(rememberScrollState())
+        ) {
+            if (!viewModel.appEntry) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_settings_alert_fill),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(bottom = MaterialTheme.padding.small)
+                            .size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.permissions),
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                }
+            }
+
+            ElevatedCard(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    // Notification Permission (Android 13+)
+                    val permissionRequester = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestPermission(),
+                        onResult = { /* handled in onResume */ }
+                    )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        PermissionItem(
+                            title = stringResource(R.string.notifications),
+                            subtitle = stringResource(R.string.notification_permission_rationale),
+                            permission = Manifest.permission.POST_NOTIFICATIONS,
+                            granted = permissionStates.notificationGranted,
+                            onRequest = { permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS) },
+                            viewModel = viewModel
+                        )
+                    }
+
+                    val nearbyDevicesPermissionRequester = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = { viewModel.updatePermissionStates() }
+                    )
+                    val telephonyPermissionRequester = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestPermission(),
+                        onResult = {
+                            // handled in onResume
+                        }
+                    )
+                    val contactsPermissionRequester = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestPermission(),
+                        onResult = {
+                            telephonyPermissionRequester.launch(Manifest.permission.READ_PHONE_STATE)
+                        }
+                    )
+                    val phoneCallPermissionRequester = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = { viewModel.updatePermissionStates() }
+                    )
+                    val smsPermissionRequester = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = { permissions ->
+                            val isGranted = permissions.entries.all { it.value }
+                            if (isGranted) {
+                                contactsPermissionRequester.launch(Manifest.permission.READ_CONTACTS)
+                            }
+                            viewModel.updatePermissionStates()
+                        }
+                    )
+
+                    PermissionItem(
+                        title = stringResource(R.string.location_permission),
+                        subtitle = stringResource(R.string.location_permission_rationale),
+                        permission = Manifest.permission.ACCESS_FINE_LOCATION,
+                        granted = permissionStates.locationGranted,
+                        onRequest = { showLocationRationaleDialog = true },
+                        viewModel = viewModel
+                    )
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        PermissionItem(
+                            title = stringResource(R.string.nearby_devices_permission),
+                            subtitle = stringResource(R.string.nearby_devices_permission_rationale),
+                            granted = permissionStates.nearbyDevicesGranted,
+                            permission = Manifest.permission.BLUETOOTH_CONNECT,
+                            onRequest = {
+                                nearbyDevicesPermissionRequester.launch(NEARBY_DEVICES_PERMISSIONS)
+                            },
+                            viewModel = viewModel
+                        )
+                    }
+
+                    PermissionItem(
+                        title = stringResource(R.string.contacts_permission),
+                        subtitle = stringResource(R.string.contacts_permission_rationale),
+                        granted = permissionStates.contactsGranted,
+                        permission = Manifest.permission.READ_CONTACTS,
+                        onRequest = {
+                            contactsPermissionRequester.launch(Manifest.permission.READ_CONTACTS)
+                        },
+                        viewModel = viewModel
+                    )
+
+                    PermissionItem(
+                        title = stringResource(R.string.messages_permission),
+                        subtitle = stringResource(R.string.messages_permission_rationale),
+                        granted = permissionStates.smsPermissionGranted,
+                        permission = Manifest.permission_group.SMS,
+                        onRequest = {
+                            smsPermissionRequester.launch(
+                                arrayOf(Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS) 
+                            )
+                        },
+                        viewModel = viewModel
+                    )
+
+                    PermissionItem(
+                        title = stringResource(R.string.phone_permission),
+                        subtitle = stringResource(R.string.phone_permission_rationale),
+                        granted = permissionStates.phoneStateGranted,
+                        permission = Manifest.permission.READ_PHONE_STATE,
+                        onRequest = {
+                            phoneCallPermissionRequester.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_PHONE_STATE,
+                                    Manifest.permission.READ_CALL_LOG
+                                )
+                            )
+                        },
+                        viewModel = viewModel
+                    )
+
+                    HorizontalDivider()
+                    // Battery Optimization
+                    PermissionItem(
+                        title = stringResource(R.string.background_battery_usage),
+                        subtitle = stringResource(R.string.background_battery_usage_rationale),
+                        granted = permissionStates.batteryGranted,
+                        onRequest = {
+                            @SuppressLint("BatteryLife")
+                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                data = "package:${context.packageName}".toUri()
+                            }
+                            context.startActivity(intent)
+                        },
+                        viewModel = viewModel
+                    )
+
+                    PermissionItem(
+                        title = stringResource(R.string.overlay_permission),
+                        subtitle = stringResource(R.string.overlay_permission_rationale),
+                        granted = permissionStates.overlayGranted,
+                        permission = Manifest.permission.SYSTEM_ALERT_WINDOW,
+                        onRequest = {
+                            val intent = Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                "package:${context.packageName}".toUri()
+                            )
+                            context.startActivity(intent)
+                        },
+                        viewModel = viewModel
+                    )
+
+                    // Storage Permission
+                    PermissionItem(
+                        title = stringResource(R.string.storage_access),
+                        subtitle = stringResource(R.string.storage_access_rationale),
+                        granted = permissionStates.storageGranted,
+                        onRequest = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                context.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+                            } else {
+                                // For older versions, request legacy storage permissions
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                }
+                                context.startActivity(intent)
+                            }
+                        },
+                        viewModel = viewModel
+                    )
+
+                    // Accessibility Service
+                    PermissionItem(
+                        title = stringResource(R.string.accessibility_service),
+                        subtitle = stringResource(R.string.accessibility_service_rationale),
+                        granted = permissionStates.accessibilityGranted,
+                        onRequest = {
+                            if (isAppSideLoaded(context)) {
+                                permissionRationaleDialog = PermissionRationaleDialog(
+                                    show = true,
+                                    permissionScreen = {
+                                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                                    },
+                                    restrictedSettings = R.string.accessibility_service
+                                )
+                            } else {
+                                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                            }
+                        },
+                        viewModel = viewModel
+                    )
+
+                    // Notification Listener
+                    PermissionItem(
+                        title = stringResource(R.string.notification_access),
+                        subtitle = stringResource(R.string.notification_access_rationale),
+                        granted = permissionStates.notificationListenerGranted,
+                        onRequest = {
+                            if (isAppSideLoaded(context)) {
+                                permissionRationaleDialog = PermissionRationaleDialog(
+                                    show = true,
+                                    permissionScreen = {
+                                        context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                                    },
+                                    restrictedSettings = R.string.notification_access
+                                )
+                            } else {
+                                context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                            }
+                        },
+                        viewModel = viewModel
+                    )
+                }
+            }
+
+            permissionRationaleDialog?.let { dialog ->
+                if (dialog.show && isAppSideLoaded(context)) {
+                    AlertDialog(
+                        onDismissRequest = { permissionRationaleDialog = null },
+                        title = { Text(stringResource(R.string.restricted_settings_title)) },
+                        text = {
+                            val settingName = stringResource(dialog.restrictedSettings)
+                            Text(
+                                stringResource(
+                                    R.string.restricted_settings_instruction,
+                                    settingName,
+                                    settingName
+                                )
+                            )
+                        },
+                        confirmButton = {
+                            Column {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceAround
+                                ) {
+                                    TextButton(
+                                        onClick = { openAppSettings(context) },
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.app_info),
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = {
+                                            dialog.permissionScreen()
+                                            permissionRationaleDialog = null
+                                        }
+                                    ) {
+                                        Text(stringResource(dialog.restrictedSettings))
+                                    }
+                                }
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = { permissionRationaleDialog = null }
+                            ) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                        }
+                    )
+                }
+            }
+
+            if (showLocationRationaleDialog) {
+                LocationPermissionRationaleDialog(
+                    onDismiss = { showLocationRationaleDialog = false },
+                    onConfirm = {
+                        viewModel.savePermissionRequested(Manifest.permission.ACCESS_FINE_LOCATION)
+                        foregroundLocationRequester.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                        showLocationRationaleDialog = false
+                    }
+                )
+            }
+        }
+    }
+
+    private fun isAppSideLoaded(context: Context): Boolean {
+        return try {
+            val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+            } else {
+                context.packageManager.getInstallerPackageName(context.packageName)
+            }
+            installer != "com.android.vending"
+        } catch (_: Exception) {
+            true // Assume side-loaded if we can't verify
+        }
+    }
+
+    companion object {
+        data class PermissionRationaleDialog(
+            val show: Boolean,
+            val permissionScreen: () -> Unit,
+            val restrictedSettings: Int
+        )
+    }
+}
+
+@Composable
+fun PermissionItem(
+    title: String,
+    subtitle: String,
+    permission: String? = null,
+    granted: Boolean,
+    onRequest: () -> Unit,
+    viewModel: SettingsViewModel
+) {
+    val context = LocalContext.current
+    val activity = context as Activity
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    val hasRequestedBefore = permission?.let {
+        viewModel.hasRequestedPermission(it)
+            .collectAsState(initial = false).value
+    } ?: false
+
+    var canShowRationale by remember { mutableStateOf(false) }
+
+    DisposableEffect(lifecycleOwner.lifecycle, permission) {
+        val observer = object: DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                permission?.let { canShowRationale = shouldShowRequestPermissionRationale(activity, it) }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    val showSettings = permission != null && !granted && hasRequestedBefore && !canShowRationale
+
+    ListItem(
+        headlineContent = { Text(text = title, style = MaterialTheme.typography.titleMedium) },
+        supportingContent = {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        trailingContent = {
+            if (granted) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                TextButton(
+                    onClick = {
+                        if (showSettings) {
+                            openAppSettings(context)
+                        } else {
+                            permission?.let { viewModel.savePermissionRequested(it) }
+                            onRequest()
+                        }
+                    }
+                ) {
+                    Text(if (showSettings) stringResource(R.string.settings) else stringResource(R.string.grant))
+                }
+            }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
+}

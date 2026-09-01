@@ -1,0 +1,113 @@
+package com.castle.FlowLink.presentation.onboarding
+
+import android.content.ActivityNotFoundException
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.castle.FlowLink.presentation.settings.SettingsViewModel
+import com.castle.FlowLink.presentation.settings.storageLocationPicker
+import FlowLink.common.R
+import FlowLink.common.util.getReadablePathFromUri
+import FlowLink.presentation.components.padding
+
+internal class StorageStep : OnboardingStep {
+    @Composable
+    override fun Content(viewModel: SettingsViewModel) {
+        val context = LocalContext.current
+        val storageLocation by viewModel.storageLocation.collectAsState()
+        val pickStorageLocation = storageLocationPicker(viewModel)
+        val storageLocationDisplay = storageLocation.ifEmpty { "/storage/emulated/0/Downloads" }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = MaterialTheme.padding.medium),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_folder),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(bottom = MaterialTheme.padding.small)
+                        .size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = stringResource(R.string.choose_storage_location),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ElevatedCard(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.storage_location_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "${stringResource(R.string.selected_folder_label)}: ${getReadablePathFromUri(context, storageLocationDisplay)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    FilledTonalButton(
+                        onClick = {
+                            try {
+                                pickStorageLocation.launch(null)
+                            } catch (_: ActivityNotFoundException) {
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.select_folder_button),
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
