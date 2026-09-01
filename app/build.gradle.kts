@@ -14,8 +14,8 @@ android {
     defaultConfig {
         applicationId = "com.castle.FlowLink"
 
-        versionCode = 27
-        versionName = "2.4.0"
+        versionCode = 28
+        versionName = "2.5.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
