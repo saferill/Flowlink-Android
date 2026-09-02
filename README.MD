@@ -55,6 +55,10 @@
 
 ## 🌟 Architecture Overview
 
+<div align="center">
+  <img src="./architecture.gif" alt="FlowLink Live Architecture Motion Flow" width="100%" style="border-radius: 16px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"/>
+</div>
+
 Open the interactive simulation in your browser:  
 👉 **[`architecture.html`](./architecture.html)** *(Interactive motion flow, live packet simulator, and real-time signal waveforms)*
 
