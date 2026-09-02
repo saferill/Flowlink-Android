@@ -3,219 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FlowLink - System Architecture & Live Motion Flow</title>
+  <title>FlowLink - Runtime Architecture Map (Archify Spec)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090a0f;
-      --card-bg: rgba(20, 24, 38, 0.75);
+      --bg-color: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.85);
       --card-border: rgba(255, 255, 255, 0.08);
-      --accent-blue: #00d2ff;
-      --accent-purple: #9d4edd;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-red: #ef4444;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --cyan: #00f2fe;
+      --purple: #9d4edd;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --pipe-border: rgba(255, 255, 255, 0.12);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
     body {
-      font-family: 'Outfit', sans-serif;
-      background-color: var(--bg-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-color);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(0, 210, 255, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(157, 78, 221, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(0, 242, 254, 0.12) 0px, transparent 40%),
+        radial-gradient(at 100% 100%, rgba(157, 78, 221, 0.12) 0px, transparent 40%),
+        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
       color: var(--text-main);
       min-height: 100vh;
-      overflow-x: hidden;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
-    /* Header */
     header {
-      padding: 24px 32px;
+      padding: 20px 36px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
-      background: rgba(9, 10, 15, 0.8);
+      background: rgba(11, 15, 25, 0.8);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 50;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .logo-badge {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #262424, #181616);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
-    }
-
-    .logo-badge svg {
-      width: 26px;
-      height: 26px;
-      fill: #ffffff;
-    }
-
-    .brand-title h1 {
-      font-size: 22px;
+    .brand-title {
+      font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(to right, #00d2ff, #9d4edd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .brand-title p {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
+    .brand-badge {
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
     }
 
-    .controls-panel {
+    .controls-bar {
       display: flex;
       gap: 10px;
-      align-items: center;
     }
 
     .btn {
       padding: 8px 16px;
       border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
-      border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       gap: 8px;
+      transition: all 0.2s ease;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #00d2ff, #0077ff);
-      color: #000;
-      border: none;
-      box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-    }
-
-    .btn-secondary:hover {
+    .btn:hover {
       background: rgba(255, 255, 255, 0.1);
+      border-color: var(--cyan);
+      transform: translateY(-1px);
     }
 
-    /* Main Canvas Area */
+    .btn.active {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+    }
+
     main {
       flex: 1;
-      padding: 32px;
-      max-width: 1400px;
+      padding: 32px 36px;
+      max-width: 1440px;
       margin: 0 auto;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
     }
 
-    .hero-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 24px 32px;
-      backdrop-filter: blur(16px);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .hero-text h2 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .hero-text p {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .sim-bar {
-      display: flex;
-      gap: 8px;
-    }
-
-    .sim-btn {
-      padding: 10px 16px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-main);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.25s ease;
-    }
-
-    .sim-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .sim-btn.active {
-      border-color: var(--accent-blue);
-      background: rgba(0, 210, 255, 0.15);
-      box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
-    }
-
-    /* Architecture Visualizer Grid */
-    .diagram-container {
+    /* Diagram Stage */
+    .stage {
       position: relative;
-      background: rgba(13, 16, 28, 0.8);
+      background: rgba(15, 23, 42, 0.6);
       border: 1px solid var(--card-border);
       border-radius: 24px;
       padding: 40px;
-      min-height: 520px;
+      min-height: 580px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.5);
       overflow: hidden;
     }
 
-    /* SVG Canvas Overlay */
-    #flowSvg {
+    /* SVG Packet Pipeline */
+    #pipelineSvg {
       position: absolute;
       top: 0;
       left: 0;
@@ -225,481 +140,383 @@
       z-index: 1;
     }
 
-    .node-card {
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 320px;
       position: relative;
       z-index: 2;
-      width: 320px;
+    }
+
+    .arch-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 24px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 16px;
+      padding: 18px 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s ease;
       cursor: pointer;
     }
 
-    .node-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(0, 210, 255, 0.4);
-      box-shadow: 0 20px 50px rgba(0, 210, 255, 0.15);
+    .arch-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--cyan);
+      box-shadow: 0 12px 30px -5px rgba(0, 242, 254, 0.2);
     }
 
-    .node-header {
+    .card-header {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-bottom: 10px;
     }
 
-    .node-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-    }
-
-    .android-icon {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--accent-green);
-    }
-
-    .desktop-icon {
-      background: linear-gradient(135deg, rgba(0, 210, 255, 0.2), rgba(0, 119, 255, 0.05));
-      border: 1px solid rgba(0, 210, 255, 0.3);
-      color: var(--accent-blue);
-    }
-
-    .mesh-icon {
-      background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(157, 78, 221, 0.05));
-      border: 1px solid rgba(157, 78, 221, 0.3);
-      color: var(--accent-purple);
-    }
-
-    .node-title h3 {
       font-size: 18px;
+    }
+
+    .card-icon.cyan { background: rgba(0, 242, 254, 0.15); color: var(--cyan); }
+    .card-icon.purple { background: rgba(157, 78, 221, 0.15); color: var(--purple); }
+    .card-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+    .card-icon.amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+
+    .card-title {
+      font-size: 15px;
       font-weight: 700;
     }
 
-    .node-title span {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .feature-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 10px;
-      font-size: 13px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      transition: all 0.2s ease;
-    }
-
-    .feature-item:hover {
-      background: rgba(255, 255, 255, 0.07);
-    }
-
-    .status-badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .badge-green {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--accent-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .badge-blue {
-      background: rgba(0, 210, 255, 0.15);
-      color: var(--accent-blue);
-      border: 1px solid rgba(0, 210, 255, 0.3);
-    }
-
-    .badge-purple {
-      background: rgba(157, 78, 221, 0.15);
-      color: var(--accent-purple);
-      border: 1px solid rgba(157, 78, 221, 0.3);
-    }
-
-    /* Central Bridge Card */
-    .bridge-node {
-      width: 280px;
-      text-align: center;
-    }
-
-    .bridge-meter {
-      margin-top: 14px;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-    }
-
-    .meter-label {
-      display: flex;
-      justify-content: space-between;
+    .card-subtitle {
       font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      color: var(--text-sub);
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .meter-bar {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .meter-fill {
-      height: 100%;
-      width: 85%;
-      background: linear-gradient(90deg, #00d2ff, #10b981);
-      border-radius: 4px;
-      animation: pulseWidth 2s infinite ease-in-out;
-    }
-
-    @keyframes pulseWidth {
-      0%, 100% { width: 75%; }
-      50% { width: 95%; }
-    }
-
-    /* Live Log Monitor */
-    .log-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 20px 24px;
-      backdrop-filter: blur(16px);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .log-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .log-screen {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 14px 18px;
-      height: 120px;
-      overflow-y: auto;
+    .card-list {
+      list-style: none;
       display: flex;
       flex-direction: column;
       gap: 6px;
       font-size: 12px;
+      color: var(--text-sub);
     }
 
-    .log-entry {
+    .card-list li {
       display: flex;
-      gap: 12px;
+      align-items: center;
+      gap: 8px;
     }
 
-    .log-time {
-      color: var(--text-muted);
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
     }
 
-    .log-msg-success { color: var(--accent-green); }
-    .log-msg-info { color: var(--accent-blue); }
-    .log-msg-action { color: var(--accent-amber); }
+    /* Central Mesh Card */
+    .center-mesh {
+      position: relative;
+      z-index: 2;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mesh-badge {
+      background: radial-gradient(circle, rgba(20, 26, 44, 0.95), rgba(10, 14, 24, 0.95));
+      border: 2px solid var(--purple);
+      box-shadow: 0 0 35px rgba(157, 78, 221, 0.35);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .mesh-badge h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .mesh-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: rgba(157, 78, 221, 0.2);
+      color: #d8b4fe;
+      padding: 3px 10px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+
+    /* Live Telemetry Log */
+    .telemetry-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .log-box {
+      margin-top: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      height: 90px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-row { display: flex; gap: 10px; }
+    .log-time { color: var(--text-sub); }
+    .log-info { color: var(--cyan); }
+    .log-ok { color: var(--green); }
+    .log-warn { color: var(--amber); }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="brand">
-      <div class="logo-badge">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-6h2v6zm0-8h-2V7h2v1z"/>
-        </svg>
-      </div>
-      <div class="brand-title">
-        <h1>FlowLink</h1>
-        <p>System Architecture & Interactive Flow Simulator</p>
-      </div>
+    <div class="brand-title">
+      <span>FlowLink</span>
+      <span class="brand-badge">Archify Runtime Model</span>
     </div>
-    <div class="controls-panel">
-      <button class="btn btn-secondary" onclick="resetSim()">↺ Reset Stream</button>
-      <button class="btn btn-primary" onclick="window.print()">📷 Export PNG / PDF</button>
+    <div class="controls-bar">
+      <button class="btn active" onclick="triggerPacket('stream')">⚡ Adaptive Stream</button>
+      <button class="btn" onclick="triggerPacket('clip')">📋 Clipboard Sync</button>
+      <button class="btn" onclick="triggerPacket('reconnect')">⏱️ 2s Fast Reconnect</button>
+      <button class="btn" onclick="triggerPacket('power')">🔒 Remote Control</button>
     </div>
   </header>
 
   <main>
-    <!-- Simulator Interactive Controls -->
-    <div class="hero-panel">
-      <div class="hero-text">
-        <h2>Live Protocol Simulation</h2>
-        <p>Trigger live signal waveforms and data packets across the TLS encrypted mesh.</p>
-      </div>
-      <div class="sim-bar">
-        <button class="sim-btn" onclick="sendSignal('photo')">📸 Send Photo (64KB)</button>
-        <button class="sim-btn" onclick="sendSignal('video')">🎬 Send 4K Video (4MB)</button>
-        <button class="sim-btn" onclick="sendSignal('lock')">🔒 Lock PC</button>
-        <button class="sim-btn" onclick="sendSignal('close_all')">🛑 Close All Apps</button>
-        <button class="sim-btn" onclick="sendSignal('shutdown')">⚡ Shutdown PC</button>
-      </div>
-    </div>
-
-    <!-- Interactive Node Diagram -->
-    <div class="diagram-container" id="diagramContainer">
-      <svg id="flowSvg">
+    <div class="stage">
+      <svg id="pipelineSvg">
         <defs>
-          <linearGradient id="gradFlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#10b981" />
-            <stop offset="50%" stop-color="#00d2ff" />
-            <stop offset="100%" stop-color="#9d4edd" />
+          <linearGradient id="streamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00f2fe"/>
+            <stop offset="50%" stop-color="#9d4edd"/>
+            <stop offset="100%" stop-color="#00f2fe"/>
           </linearGradient>
           <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            <feGaussianBlur stdDeviation="6" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
           </filter>
         </defs>
-
-        <!-- Base Circuit Lines -->
-        <path id="pathLeft" d="M 330 260 L 530 260" stroke="rgba(255, 255, 255, 0.1)" stroke-width="3" stroke-dasharray="6,6" fill="none"/>
-        <path id="pathRight" d="M 810 260 L 1010 260" stroke="rgba(255, 255, 255, 0.1)" stroke-width="3" stroke-dasharray="6,6" fill="none"/>
-
-        <!-- Animated Pulse Circle Container -->
-        <g id="pulseGroup"></g>
+        <path id="pipeLeft" d="M 360 290 L 510 290" stroke="url(#streamGrad)" stroke-width="4" fill="none" opacity="0.6"/>
+        <path id="pipeRight" d="M 850 290 L 1000 290" stroke="url(#streamGrad)" stroke-width="4" fill="none" opacity="0.6"/>
+        <g id="packetContainer"></g>
       </svg>
 
-      <!-- 1. ANDROID NODE -->
-      <div class="node-card" id="androidNode">
-        <div class="node-header">
-          <div class="node-icon android-icon">📱</div>
-          <div class="node-title">
-            <h3>FlowLink Android</h3>
-            <span>Kotlin & Compose UI</span>
+      <!-- Android Components (Left) -->
+      <div class="column" id="androidCol">
+        <div class="arch-card">
+          <div class="card-header">
+            <div class="card-icon cyan">📱</div>
+            <div>
+              <div class="card-title">FlowLink Android</div>
+              <div class="card-subtitle">Kotlin • Jetpack Compose</div>
+            </div>
           </div>
+          <ul class="card-list">
+            <li><span class="dot"></span>Foreground NetworkService & WiFiLock</li>
+            <li><span class="dot"></span>Real-time Clipboard Monitor (Debounced)</li>
+            <li><span class="dot"></span>Remote Device Control Dispatcher</li>
+          </ul>
         </div>
-        <div class="feature-list">
-          <div class="feature-item">
-            <span>Tailscale & LAN Discovery</span>
-            <span class="status-badge badge-green">100.64.0.0/10</span>
+
+        <div class="arch-card">
+          <div class="card-header">
+            <div class="card-icon green">⚡</div>
+            <div>
+              <div class="card-title">Adaptive Stream Socket</div>
+              <div class="card-subtitle">SendFileHandler (15s Timeout)</div>
+            </div>
           </div>
-          <div class="feature-item">
-            <span>Adaptive Buffer Engine</span>
-            <span class="status-badge badge-green">64KB – 4MB</span>
+          <ul class="card-list">
+            <li><span class="dot"></span>64KB Chunk for Photos/Docs (&lt;30ms)</li>
+            <li><span class="dot"></span>4MB Mega-Chunk for 4K Videos</li>
+            <li><span class="dot"></span>Socket soTimeout = 30000ms (Anti-Hang)</li>
+          </ul>
+        </div>
+
+        <div class="arch-card">
+          <div class="card-header">
+            <div class="card-icon amber">🌐</div>
+            <div>
+              <div class="card-title">Discovery Engine</div>
+              <div class="card-subtitle">mDNS & Tailscale CGNAT</div>
+            </div>
           </div>
-          <div class="feature-item">
-            <span>Device Control Card</span>
-            <span class="status-badge badge-green">Lock / Close / Off</span>
-          </div>
-          <div class="feature-item">
-            <span>Ktor TLS Client</span>
-            <span class="status-badge badge-green">Port 5149–5169</span>
-          </div>
+          <ul class="card-list">
+            <li><span class="dot"></span>Local WiFi Multicast (Port 5149)</li>
+            <li><span class="dot"></span>WireGuard Private IP (100.64.0.0/10)</li>
+          </ul>
         </div>
       </div>
 
-      <!-- 2. TAILSCALE & TLS ENCRYPTED MESH -->
-      <div class="node-card bridge-node" id="bridgeNode">
-        <div class="node-header" style="justify-content: center;">
-          <div class="node-icon mesh-icon">⚡</div>
-        </div>
-        <div class="node-title">
-          <h3>Encrypted Mesh Tunnel</h3>
-          <span>TLS 1.3 / WireGuard / Direct LAN</span>
-        </div>
-        <div class="bridge-meter">
-          <div class="meter-label">
-            <span>TCP NODELAY</span>
-            <span>0 ms LAG</span>
-          </div>
-          <div class="meter-bar">
-            <div class="meter-fill"></div>
-          </div>
+      <!-- Mesh Interlink Center -->
+      <div class="center-mesh">
+        <div class="mesh-badge">
+          <h3>TLS 1.3 / WireGuard Mesh</h3>
+          <span class="mesh-tag">PORT 5149 — 5169</span>
+          <p style="font-size: 12px; color: var(--text-sub); line-height: 1.5;">
+            End-to-End Encrypted Tunnel<br/>
+            Zero Third-Party Cloud Servers<br/>
+            Direct Peer-to-Peer 0ms Latency
+          </p>
         </div>
       </div>
 
-      <!-- 3. WINDOWS DESKTOP NODE -->
-      <div class="node-card" id="desktopNode">
-        <div class="node-header">
-          <div class="node-icon desktop-icon">🖥️</div>
-          <div class="node-title">
-            <h3>FlowLink Desktop</h3>
-            <span>WinUI 3 & .NET 9</span>
+      <!-- Windows Desktop Components (Right) -->
+      <div class="column" id="desktopCol">
+        <div class="arch-card">
+          <div class="card-header">
+            <div class="card-icon purple">💻</div>
+            <div>
+              <div class="card-title">FlowLink Desktop</div>
+              <div class="card-subtitle">WinUI 3 • .NET 9 Service</div>
+            </div>
           </div>
+          <ul class="card-list">
+            <li><span class="dot" style="background:var(--purple);"></span>Persistent Multi-IP Cache (SQLite)</li>
+            <li><span class="dot" style="background:var(--purple);"></span>Tray Minimizer & Auto-Start at Boot</li>
+            <li><span class="dot" style="background:var(--purple);"></span>Explorer 'Send To Phone' Integration</li>
+          </ul>
         </div>
-        <div class="feature-list">
-          <div class="feature-item">
-            <span>System Tray Autostart</span>
-            <span class="status-badge badge-blue">Silent Boot</span>
+
+        <div class="arch-card">
+          <div class="card-header">
+            <div class="card-icon cyan">⏱️</div>
+            <div>
+              <div class="card-title">2s Auto-Connect Loop</div>
+              <div class="card-subtitle">DiscoveryService & NetworkService</div>
+            </div>
           </div>
-          <div class="feature-item">
-            <span>Fast Tailscale Polling</span>
-            <span class="status-badge badge-blue">Adaptive 3s</span>
+          <ul class="card-list">
+            <li><span class="dot" style="background:var(--purple);"></span>Aggressive 2s Fast Polling on Startup</li>
+            <li><span class="dot" style="background:var(--purple);"></span>Instant Reset on Manual Reconnect</li>
+            <li><span class="dot" style="background:var(--purple);"></span>Auto-Target Stored Persistent IPs</li>
+          </ul>
+        </div>
+
+        <div class="arch-card">
+          <div class="card-header">
+            <div class="card-icon green">⚡</div>
+            <div>
+              <div class="card-title">Win32 API Executor</div>
+              <div class="card-subtitle">Sub-second Native Execution</div>
+            </div>
           </div>
-          <div class="feature-item">
-            <span>Win32 Native Actions</span>
-            <span class="status-badge badge-blue">Lock / EnumWindows</span>
-          </div>
-          <div class="feature-item">
-            <span>Explorer Context Menu</span>
-            <span class="status-badge badge-blue">Right Click Send</span>
-          </div>
+          <ul class="card-list">
+            <li><span class="dot" style="background:var(--purple);"></span>User32.dll LockWorkStation() (0ms)</li>
+            <li><span class="dot" style="background:var(--purple);"></span>Graceful CloseAllUserWindows()</li>
+            <li><span class="dot" style="background:var(--purple);"></span>Safe Shutdown & Hibernate Trigger</li>
+          </ul>
         </div>
       </div>
     </div>
 
-    <!-- Console Log Monitor -->
-    <div class="log-panel">
-      <div class="log-header">
-        <span>LIVE TELEMETRY LOGS</span>
-        <span id="logStatus" style="color: var(--accent-green);">● LINK ACTIVE</span>
+    <!-- Live Telemetry Log -->
+    <div class="telemetry-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:700; color:var(--text-main);">📡 FlowLink Runtime State Machine Telemetry</span>
+        <span style="color:var(--green); font-size:11px;">● ALL 12 RUNTIME NODES VERIFIED</span>
       </div>
-      <div class="log-screen" id="logScreen">
-        <div class="log-entry">
-          <span class="log-time">[SYSTEM]</span>
-          <span class="log-msg-success">FlowLink Mesh Initialized (TLS Port 5149 Bound, Fast Polling active).</span>
+      <div class="log-box" id="logBox">
+        <div class="log-row">
+          <span class="log-time">[BOOT]</span>
+          <span class="log-ok">FlowLink System initialized across Android & Windows Desktop</span>
+        </div>
+        <div class="log-row">
+          <span class="log-time">[NET]</span>
+          <span class="log-info">TLS 1.3 Handshake completed on Port 5149. WireGuard 100.x mesh active.</span>
         </div>
       </div>
     </div>
   </main>
 
   <script>
-    function addLog(msg, type = 'info') {
-      const screen = document.getElementById('logScreen');
+    function addLog(tag, msg, type = 'info') {
+      const box = document.getElementById('logBox');
+      const row = document.createElement('div');
+      row.className = 'log-row';
       const time = new Date().toTimeString().split(' ')[0];
-      const entry = document.createElement('div');
-      entry.className = 'log-entry';
-      
-      let classType = 'log-msg-info';
-      if (type === 'success') classType = 'log-msg-success';
-      if (type === 'action') classType = 'log-msg-action';
-
-      entry.innerHTML = `<span class="log-time">[${time}]</span><span class="${classType}">${msg}</span>`;
-      screen.appendChild(entry);
-      screen.scrollTop = screen.scrollHeight;
+      row.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${type}">[${tag}] ${msg}</span>`;
+      box.appendChild(row);
+      box.scrollTop = box.scrollHeight;
     }
 
-    function sendSignal(type) {
-      const pulseGroup = document.getElementById('pulseGroup');
+    function triggerPacket(type) {
+      const container = document.getElementById('packetContainer');
       const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       
-      let color = '#00d2ff';
-      let radius = 6;
-      let label = '';
+      let color = '#00f2fe';
+      let r = 8;
 
-      if (type === 'photo') {
+      if (type === 'stream') {
         color = '#10b981';
-        radius = 7;
-        label = 'Photo (64KB adaptive burst) sent from Android to Desktop.';
-        addLog(label, 'success');
-      } else if (type === 'video') {
-        color = '#00d2ff';
-        radius = 12;
-        label = '4K Video (4MB mega-chunks) streaming over 2MB socket window at wire-speed.';
-        addLog(label, 'info');
-      } else if (type === 'lock') {
+        r = 10;
+        addLog('STREAM', 'Adaptive Mega-Chunk stream (4MB buffer) sent at wire-speed', 'ok');
+      } else if (type === 'clip') {
+        color = '#00f2fe';
+        r = 7;
+        addLog('CLIPBOARD', 'Real-time clipboard synchronization payload delivered (12ms latency)', 'info');
+      } else if (type === 'reconnect') {
+        color = '#9d4edd';
+        r = 9;
+        addLog('AUTOCONNECT', 'Aggressive 2s reconnect pulse fired -> Stored persistent IP matched', 'info');
+      } else if (type === 'power') {
         color = '#f59e0b';
-        radius = 8;
-        label = 'Action Signal: LockWorkStation() dispatched -> Desktop Screen Locked (0ms).';
-        addLog(label, 'action');
-      } else if (type === 'close_all') {
-        color = '#ef4444';
-        radius = 9;
-        label = 'Action Signal: CloseAllUserWindows() -> Sent WM_CLOSE to all running apps & tabs.';
-        addLog(label, 'action');
-      } else if (type === 'shutdown') {
-        color = '#ef4444';
-        radius = 10;
-        label = 'Action Signal: Executing shutdown.exe /s /t 0 /f -> PC Shutting Down.';
-        addLog(label, 'action');
+        r = 10;
+        addLog('ACTION', 'Remote Control Signal -> Win32 LockWorkStation() executed (0ms response)', 'warn');
       }
 
-      circle.setAttribute('r', radius);
+      circle.setAttribute('r', r);
       circle.setAttribute('fill', color);
       circle.setAttribute('filter', 'url(#glow)');
-      pulseGroup.appendChild(circle);
+      circle.setAttribute('cy', 290);
+      container.appendChild(circle);
 
-      // Animate packet along path
-      let progress = 0;
-      const startX = 330;
-      const endX = 1010;
-      const y = 260;
+      let startX = 360;
+      let endX = 1000;
+      let currentX = startX;
+      let step = 9;
 
-      const anim = setInterval(() => {
-        progress += 0.035;
-        const currentX = startX + (endX - startX) * progress;
+      function stepAnim() {
+        currentX += step;
         circle.setAttribute('cx', currentX);
-        circle.setAttribute('cy', y);
-
-        if (progress >= 1) {
-          clearInterval(anim);
-          pulseGroup.removeChild(circle);
-          highlightNode('desktopNode');
+        if (currentX < endX) {
+          requestAnimationFrame(stepAnim);
+        } else {
+          container.removeChild(circle);
         }
-      }, 16);
+      }
+      requestAnimationFrame(stepAnim);
     }
 
-    function highlightNode(id) {
-      const el = document.getElementById(id);
-      el.style.transform = 'scale(1.03)';
-      el.style.borderColor = 'var(--accent-blue)';
-      setTimeout(() => {
-        el.style.transform = '';
-        el.style.borderColor = '';
-      }, 300);
-    }
-
-    function resetSim() {
-      document.getElementById('logScreen').innerHTML = '';
-      addLog('Stream and log history reset.', 'info');
-    }
-
-    // Auto-pulse telemetry heartbeat
+    // Auto periodic telemetry pulse
     setInterval(() => {
-      const pulseGroup = document.getElementById('pulseGroup');
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('r', '4');
-      circle.setAttribute('fill', '#9d4edd');
-      circle.setAttribute('filter', 'url(#glow)');
-      pulseGroup.appendChild(circle);
-
-      let progress = 0;
-      const startX = 1010;
-      const endX = 330;
-      const y = 260;
-
-      const anim = setInterval(() => {
-        progress += 0.02;
-        const currentX = startX + (endX - startX) * progress;
-        circle.setAttribute('cx', currentX);
-        circle.setAttribute('cy', y);
-
-        if (progress >= 1) {
-          clearInterval(anim);
-          pulseGroup.removeChild(circle);
-        }
-      }, 20);
-    }, 4000);
+      triggerPacket('stream');
+    }, 4500);
   </script>
 </body>
 </html>
