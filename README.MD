@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./logo.png" alt="FlowLink Logo" width="140" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); margin-bottom: 12px;"/>
+<img src="./banner.jpg" alt="FlowLink Banner" width="100%" style="border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"/>
 
 # ⚡ FlowLink Android
 
@@ -14,6 +14,23 @@
 <br/>
 
 **FlowLink Android** connects your smartphone and Windows PC into a unified ecosystem. Enjoy **zero-latency real-time clipboard sync**, **encrypted peer-to-peer file transfers**, **remote PC power controls**, and **seamless Tailscale mesh discovery**.
+
+</div>
+
+---
+
+## 📸 Tampilan Aplikasi (App Screenshots)
+
+<div align="center">
+
+| Beranda & Remote Control | Manajemen Perangkat | Pengaturan Aplikasi |
+| :---: | :---: | :---: |
+| <img src="./screenshot_home.jpg" width="240" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"/> | <img src="./screenshot_devices.jpg" width="240" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"/> | <img src="./screenshot_settings.jpg" width="240" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);"/> |
+
+<br/>
+
+### 💻 Pasangan Windows Desktop
+<img src="./screenshot_desktop.png" width="85%" style="border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); margin-top: 8px;"/>
 
 </div>
 
@@ -61,7 +78,7 @@ flowchart LR
     subgraph DESKTOP["💻 FlowLink Desktop (WinUI 3 / .NET 9)"]
         direction TB
         D1["🔄 Silent System Tray Autostart (Boot / Restart)"]
-        D2["⏱️ Adaptive 3s Fast Polling Discovery Loop"]
+        D2["⏱️ Adaptive 2s Fast Polling Discovery Loop"]
         D3["🖱️ Explorer Context Menu ('Send to Phone')"]
         D4["⚡ Native Win32 API Execution (0ms Response)"]
     end
