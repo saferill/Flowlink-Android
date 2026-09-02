@@ -49,6 +49,7 @@ class ReceiveFileHandler(
 
     suspend fun receive(): Uri? {
         clientSocket.tcpNoDelay = true
+        clientSocket.soTimeout = 30000 // 30s read timeout to prevent forever hang
         clientSocket.sendBufferSize = 2 * 1024 * 1024
         clientSocket.receiveBufferSize = 2 * 1024 * 1024
 

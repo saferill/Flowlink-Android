@@ -24,12 +24,15 @@ class SocketFactoryImpl @Inject constructor() : SocketFactory {
         return try {
             Log.d(TAG, "Connecting to $address:$port")
             val sslContext = SslHelper.sslContext(certificate)
-            withTimeoutOrNull(3000L) {
+            withTimeoutOrNull(3500L) {
                 withContext(Dispatchers.IO) {
-                    (sslContext.socketFactory.createSocket(address, port) as SSLSocket).apply {
+                    val rawSocket = java.net.Socket()
+                    rawSocket.tcpNoDelay = true
+                    rawSocket.sendBufferSize = 2 * 1024 * 1024
+                    rawSocket.receiveBufferSize = 2 * 1024 * 1024
+                    rawSocket.connect(java.net.InetSocketAddress(address, port), 2500)
+                    (sslContext.socketFactory.createSocket(rawSocket, address, port, true) as SSLSocket).apply {
                         tcpNoDelay = true
-                        sendBufferSize = 2 * 1024 * 1024
-                        receiveBufferSize = 2 * 1024 * 1024
                         startHandshake()
                     }
                 }

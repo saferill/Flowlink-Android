@@ -54,10 +54,16 @@ class SendFileHandler(
             notifications.showProgress(transferId = transferId, title = title)
 
             sslSocket = withContext(Dispatchers.IO) {
-                serverSocket.accept() as? SSLSocket
+                try {
+                    serverSocket.soTimeout = 15000 // 15s timeout to prevent hanging forever
+                    serverSocket.accept() as? SSLSocket
+                } catch (e: java.net.SocketTimeoutException) {
+                    throw IOException("Connection timed out waiting for $deviceName. Check network connection.", e)
+                }
             } ?: throw IOException("Failed to accept SSL connection")
 
             sslSocket.tcpNoDelay = true
+            sslSocket.soTimeout = 30000 // 30s read timeout
             sslSocket.sendBufferSize = 2 * 1024 * 1024
             sslSocket.receiveBufferSize = 2 * 1024 * 1024
 
