@@ -30,3 +30,4 @@ Menambahkan dukungan panggilan telepon langsung lewat aplikasi di PC dengan mema
 
 > **Rekomendasi Rencana Kerja**:
 > Mulai dengan **No. 2 (Drag-and-Drop Overlay)** karena merupakan perbaikan cepat (quick win), dilanjutkan dengan **No. 1 (Embed scrcpy)** untuk memberikan peningkatan estetika terbesar pada aplikasi.
+ 
