@@ -1,16 +1,6 @@
-v1.0.0:
-
-Note: Casting/Mirroring has been removed for now.
-
-Features:
-
-* Android storage in Windows Explorer.
-* Auto clipboard sync (enable accessibility permissions).
-* Notification filtering & actions.
-* Receive images & bulk transfers from Windows clipboard.
-* Add/change device IP.
-* Other:
-
-* Android 15 support.
-* New onboarding & UI.
-* Improved security, device discovery & stability.
+• Initial official release (v1.0.0) of FlowLink Android.
+• Real-time two-way clipboard synchronization with Windows Desktop.
+• Adaptive high-speed peer-to-peer file transfer (up to 4MB chunk streaming).
+• Quick remote control shortcuts: Lock Screen, Close All Apps, Shutdown, Restart, Hibernate.
+• Auto-reconnect and Tailscale mesh VPN discovery for seamless remote pairing.
+• Modern Material You dark-themed interface with zero telemetry.
