@@ -1,4 +1,4 @@
-package FlowLink.common.util
+﻿package FlowLink.common.util
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,7 +11,6 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.scale
 import java.io.ByteArrayOutputStream
-
 
 fun bitmapToBase64(bitmap: Bitmap): String {
     val outputStream = ByteArrayOutputStream()

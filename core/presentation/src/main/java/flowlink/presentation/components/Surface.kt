@@ -1,4 +1,4 @@
-package FlowLink.presentation.components
+﻿package FlowLink.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -30,11 +30,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.ln
 
-/**
- * Surface with additional onLongClick functionality.
- *
- * @see androidx.compose.material3.Surface
- */
 @Composable
 @NonRestartableComposable
 fun Surface(

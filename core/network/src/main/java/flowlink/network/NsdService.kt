@@ -1,4 +1,4 @@
-package FlowLink.network
+﻿package FlowLink.network
 
 import android.content.Context
 import android.content.Context.WIFI_SERVICE
@@ -189,10 +189,7 @@ class NsdService @Inject constructor(val context: Context) {
         }
     }
 
-    /**
-     * Returns a new listener instance since NsdManager wants a different listener each time you call resolveService
-     */
-    private fun createResolveListener(): NsdManager.ResolveListener {
+        private fun createResolveListener(): NsdManager.ResolveListener {
         return object : NsdManager.ResolveListener {
             override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
                 Log.w(TAG, "MDNS Resolve failed: Error code: $errorCode")

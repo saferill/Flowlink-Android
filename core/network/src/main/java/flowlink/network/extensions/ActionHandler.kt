@@ -1,4 +1,4 @@
-package FlowLink.network.extensions
+﻿package FlowLink.network.extensions
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

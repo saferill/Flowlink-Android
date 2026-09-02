@@ -1,4 +1,4 @@
-package FlowLink.common.util
+﻿package FlowLink.common.util
 
 object MimeType {
     const val TYPE_TEXT: String = "text/plain"

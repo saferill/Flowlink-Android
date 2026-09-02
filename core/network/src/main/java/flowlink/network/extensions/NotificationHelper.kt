@@ -1,4 +1,4 @@
-package FlowLink.network.extensions
+﻿package FlowLink.network.extensions
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -101,12 +101,6 @@ fun NetworkService.showBluetoothDiscoverableRequestNotification(sourceDeviceId: 
     }
 }
 
-/**
- * Sets the foreground notification based on connection state
- * @param deviceName Device name(s) to display (comma-separated if multiple)
- * @param deviceId Device ID for disconnect action (only used when single device connected)
- * @param notificationId Notification ID to use
- */
 fun NetworkService.setNotification(
     deviceName: String?,
     deviceId: String?,

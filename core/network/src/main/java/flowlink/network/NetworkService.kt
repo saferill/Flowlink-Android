@@ -1,4 +1,4 @@
-package FlowLink.network
+﻿package FlowLink.network
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
@@ -471,7 +471,6 @@ class NetworkService : Service() {
         }
     }
 
-
     suspend fun connectTo(connectionDetails: ConnectionDetails) {
         removeConnection(connectionDetails.deviceId)
         deviceManager.removeDiscoveredDevice(connectionDetails.deviceId)
@@ -613,10 +612,7 @@ class NetworkService : Service() {
         }
     }
 
-    /**
-     * Starts listening for messages from a device connection.
-     */
-    private fun startListeningForDevice(connection: DeviceConnection) {
+        private fun startListeningForDevice(connection: DeviceConnection) {
         connection.startListening(
             getDevice = { deviceManager.getDevice(it) },
             onMessage = { device, message -> scope.launch { handleMessage(device, message) } },

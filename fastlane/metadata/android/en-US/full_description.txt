@@ -1,13 +1,12 @@
-<b>FlowLink</b> seamlessly connects your Android smartphone with your Windows PC into a single unified workspace. Enjoy real-time synchronization, instant file sharing, and remote control over your local network and Tailscale mesh VPN without reliance on third-party cloud servers.
+<b>FlowLink</b> lets you connect your Android phone and Windows PC over local Wi-Fi or Tailscale without using cloud servers.
 
-<b>Key Features:</b>
-• <b>Instant Clipboard Sync:</b> Copy text, links, or snippets on your Android phone and paste immediately on your Windows PC (and vice versa) with sub-second latency.
-• <b>Blazing-Fast File Transfer:</b> Wire-speed peer-to-peer file transfer. Adaptive socket buffers send photos and documents in milliseconds, and large videos at maximum Wi-Fi bandwidth.
-• <b>Remote Power Controls:</b> Lock your PC screen, close all running apps, restart, or safely shut down your Windows computer directly from your phone.
-• <b>Tailscale Mesh Support:</b> Automatic discovery and continuous connection across different networks using secure WireGuard-based Tailscale private IPs.
-• <b>100% Private & Open Source:</b> End-to-end encrypted local connections. No telemetry, no advertisements, and no third-party tracking.
-• <b>Banking App Friendly:</b> Designed with strict privacy standards—no dangerous accessibility overlay permissions or intrusive SMS interception.
+<b>Features:</b>
+• <b>Clipboard Sync:</b> Copy text or links on your phone and paste directly on your PC, and vice versa.
+• <b>File Sharing:</b> Send photos, documents, and large files directly between devices over your local network.
+• <b>PC Remote Control:</b> Lock your PC screen, put it to sleep, or shut it down from your phone.
+• <b>Tailscale Support:</b> Connect even when you're away from home using your private Tailscale network.
+• <b>Private & Open Source:</b> No ads, no analytics, and no tracking.
 
 <b>Requirements:</b>
-Requires the companion <b>FlowLink Desktop</b> app installed on your Windows 10/11 PC.
-Source code & desktop client: https://github.com/saferill/Flowlink-Desktop
+Requires FlowLink Desktop on your Windows 10 or 11 PC.
+Source code: https://github.com/saferill/Flowlink-Desktop

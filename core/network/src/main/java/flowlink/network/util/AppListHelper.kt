@@ -1,4 +1,4 @@
-package FlowLink.network.util
+﻿package FlowLink.network.util
 
 import android.annotation.SuppressLint
 import android.content.Intent

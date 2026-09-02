@@ -1,4 +1,4 @@
-package FlowLink.database
+﻿package FlowLink.database
 
 import androidx.room.TypeConverter
 import kotlinx.serialization.encodeToString

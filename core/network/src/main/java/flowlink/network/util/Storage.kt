@@ -1,4 +1,4 @@
-package FlowLink.network.util
+﻿package FlowLink.network.util
 
 import java.text.DecimalFormat
 
@@ -21,7 +21,6 @@ import java.text.DecimalFormat
 //        usedSpace = usedSpace
 //    )
 //}
-
 
 fun formatSize(size: Long): String {
     val kilo = 1024.0

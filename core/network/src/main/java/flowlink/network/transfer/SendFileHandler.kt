@@ -1,4 +1,4 @@
-package FlowLink.network.transfer
+﻿package FlowLink.network.transfer
 
 import android.content.Context
 import android.net.Uri
@@ -20,9 +20,6 @@ import java.io.IOException
 import javax.net.ssl.SSLServerSocket
 import javax.net.ssl.SSLSocket
 
-/**
- * Handles sending files to a remote device.
- */
 class SendFileHandler(
     private val context: Context,
     private val transferId: String,

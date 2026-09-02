@@ -1,4 +1,4 @@
-package FlowLink.database.model
+﻿package FlowLink.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

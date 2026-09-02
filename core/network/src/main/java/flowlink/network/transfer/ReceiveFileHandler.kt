@@ -1,4 +1,4 @@
-package FlowLink.network.transfer
+﻿package FlowLink.network.transfer
 
 import android.content.ContentValues
 import android.content.Context
@@ -26,10 +26,6 @@ import java.io.File
 import java.io.IOException
 import javax.net.ssl.SSLSocket
 
-/**
- * Handles receiving files from a remote device.
- * @param notifications Optional notification helper. If null, no notifications are shown (e.g., clipboard transfers).
- */
 class ReceiveFileHandler(
     private val context: Context,
     private val transferId: String,

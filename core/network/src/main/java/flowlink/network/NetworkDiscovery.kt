@@ -1,4 +1,4 @@
-package FlowLink.network
+﻿package FlowLink.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -319,7 +319,6 @@ class NetworkDiscovery @Inject constructor(
             }
         }
     }
-
 
     private suspend fun startDeviceListener() {
         Log.d(TAG, "Device listener started")

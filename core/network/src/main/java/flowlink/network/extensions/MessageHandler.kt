@@ -1,4 +1,4 @@
-package FlowLink.network.extensions
+﻿package FlowLink.network.extensions
 
 import android.app.NotificationManager
 import android.content.Intent
@@ -172,8 +172,6 @@ fun NetworkService.handleDndStatus(dndStatus: DndState) {
         Log.e(TAG, "Error setting DND mode", e)
     }
 }
-
-
 
 private fun NetworkService.handleNotificationMessage(message: NotificationInfo) {
     when (message.infoType) {

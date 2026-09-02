@@ -1,4 +1,4 @@
-package FlowLink.network.transfer
+﻿package FlowLink.network.transfer
 
 import android.content.Context
 import android.os.Build
@@ -84,7 +84,6 @@ class SftpServer @Inject constructor(
                 }
             )
         }.build()
-
 
         sshd.commandFactory = ScpCommandFactory()
         sshd.subsystemFactories =

@@ -1,4 +1,4 @@
-package FlowLink.common.util
+﻿package FlowLink.common.util
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -183,7 +183,6 @@ fun phoneStatePermissionGranted(
     }
     return phoneStateGranted
 }
-
 
 fun isCallLogsPermissionGranted(context: Context) : Boolean {
     return context.checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED

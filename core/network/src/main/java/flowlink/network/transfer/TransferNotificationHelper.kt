@@ -1,4 +1,4 @@
-package FlowLink.network.transfer
+﻿package FlowLink.network.transfer
 
 import android.app.PendingIntent
 import android.content.Context
@@ -12,10 +12,6 @@ import FlowLink.network.NetworkService
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Handles file transfer notifications.
- * Only responsible for displaying notifications, not formatting strings.
- */
 @Singleton
 class TransferNotificationHelper @Inject constructor(
     private val context: Context,

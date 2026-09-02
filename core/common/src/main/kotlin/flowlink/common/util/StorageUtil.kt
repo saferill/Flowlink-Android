@@ -1,4 +1,4 @@
-package FlowLink.common.util
+﻿package FlowLink.common.util
 
 import android.content.Context
 import android.net.Uri
@@ -7,27 +7,11 @@ import java.io.File
 import java.net.URLDecoder
 import androidx.core.net.toUri
 
-/**
- * Creates a temporary file in the app's cache directory.
- * The file is marked for deletion on JVM exit.
- * 
- * @param context Application context
- * @param prefix Prefix for the temp file name
- * @param extension File extension (without dot), e.g. "jpg", "png"
- * @return URI to the created temp file via FileProvider
- */
 fun createTempFileUri(context: Context, prefix: String, extension: String): Uri {
     val tempFile = createTempFile(context, prefix, extension)
     return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tempFile)
 }
 
-/**
- * Creates a temporary file in the app's cache directory.
- * Use this when you need to write to the file before getting a URI.
- * Call [getFileProviderUri] after writing to get the shareable URI.
- * 
- * @return The created temp File
- */
 fun createTempFile(context: Context, prefix: String, extension: String): File {
     return File.createTempFile(
         prefix,
@@ -36,17 +20,10 @@ fun createTempFile(context: Context, prefix: String, extension: String): File {
     ).apply { deleteOnExit() }
 }
 
-/**
- * Gets a FileProvider URI for an existing file.
- */
 fun getFileProviderUri(context: Context, file: File): Uri {
     return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 }
 
-/**
- * Helper function to return a human-readable version of the URI.
- * It supports both document tree URIs (content://...) and direct file paths (/storage/emulated/0/...).
- */
 fun getReadablePathFromUri(context: Context, uriString: String): String {
     return if (uriString.startsWith("content://")) {
         // Parse the URI and convert it to a human-readable path
@@ -58,9 +35,6 @@ fun getReadablePathFromUri(context: Context, uriString: String): String {
     }
 }
 
-/**
- * Helper function to get the human-readable path from a Document Tree URI.
- */
 private fun getPathFromTreeUri(uri: Uri): String {
     // Decode the URI to make it human-readable
     val decodedPath = URLDecoder.decode(uri.toString(), "UTF-8")

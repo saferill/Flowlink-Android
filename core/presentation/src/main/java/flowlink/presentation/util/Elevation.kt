@@ -1,4 +1,4 @@
-package FlowLink.presentation.util
+﻿package FlowLink.presentation.util
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -13,20 +13,6 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.ui.unit.Dp
 
-/**
- * Animates the [Dp] value of [this] between [from] and [to] [Interaction]s, to [target]. The
- * [AnimationSpec] used depends on the values for [from] and [to], see
- * [ElevationDefaults.incomingAnimationSpecForInteraction] and
- * [ElevationDefaults.outgoingAnimationSpecForInteraction] for more details.
- *
- * @param target the [Dp] target elevation for this component, corresponding to the elevation
- * desired for the [to] state.
- * @param from the previous [Interaction] that was used to calculate elevation. `null` if there
- * was no previous [Interaction], such as when the component is in its default state.
- * @param to the [Interaction] that this component is moving to, such as [PressInteraction.Press]
- * when this component is being pressed. `null` if this component is moving back to its default
- * state.
- */
 suspend fun Animatable<Dp, *>.animateElevation(
     target: Dp,
     from: Interaction? = null,
@@ -44,23 +30,8 @@ suspend fun Animatable<Dp, *>.animateElevation(
     if (spec != null) animateTo(target, spec) else snapTo(target)
 }
 
-/**
- * Contains default [AnimationSpec]s used for animating elevation between different [Interaction]s.
- *
- * Typically you should use [animateElevation] instead, which uses these [AnimationSpec]s
- * internally. [animateElevation] in turn is used by the defaults for cards and buttons.
- *
- * @see animateElevation
- */
 private object ElevationDefaults {
-    /**
-     * Returns the [AnimationSpec]s used when animating elevation to [interaction], either from a
-     * previous [Interaction], or from the default state. If [interaction] is unknown, then
-     * returns `null`.
-     *
-     * @param interaction the [Interaction] that is being animated to
-     */
-    fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
+        fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
             is PressInteraction.Press -> DefaultIncomingSpec
             is DragInteraction.Start -> DefaultIncomingSpec
@@ -70,13 +41,7 @@ private object ElevationDefaults {
         }
     }
 
-    /**
-     * Returns the [AnimationSpec]s used when animating elevation away from [interaction], to the
-     * default state. If [interaction] is unknown, then returns `null`.
-     *
-     * @param interaction the [Interaction] that is being animated away from
-     */
-    fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
+        fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
         return when (interaction) {
             is PressInteraction.Press -> DefaultOutgoingSpec
             is DragInteraction.Start -> DefaultOutgoingSpec

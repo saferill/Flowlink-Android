@@ -1,4 +1,4 @@
-package FlowLink.presentation.components
+﻿package FlowLink.presentation.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
@@ -42,11 +42,6 @@ import FlowLink.presentation.util.animateElevation
 
 import androidx.compose.material3.ButtonDefaults as M3ButtonDefaults
 
-/**
- * TextButton with additional onLongClick functionality.
- *
- * @see androidx.compose.material3.TextButton
- */
 @Composable
 fun TextButton(
     onClick: () -> Unit,
@@ -79,11 +74,6 @@ fun TextButton(
     content = content,
 )
 
-/**
- * Button with additional onLongClick functionality.
- *
- * @see androidx.compose.material3.TextButton
- */
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -132,16 +122,7 @@ fun Button(
 }
 
 object ButtonDefaults {
-    /**
-     * Creates a [ButtonColors] that represents the default container and content colors used in a
-     * [Button].
-     *
-     * @param containerColor the container color of this [Button] when enabled.
-     * @param contentColor the content color of this [Button] when enabled.
-     * @param disabledContainerColor the container color of this [Button] when not enabled.
-     * @param disabledContentColor the content color of this [Button] when not enabled.
-     */
-    @Composable
+        @Composable
     fun buttonColors(
         containerColor: Color = MaterialTheme.colorScheme.primary,
         contentColor: Color = MaterialTheme.colorScheme.onPrimary,
@@ -154,18 +135,7 @@ object ButtonDefaults {
         disabledContentColor = disabledContentColor,
     )
 
-    /**
-     * Creates a [ButtonElevation] that will animate between the provided values according to the
-     * Material specification for a [Button].
-     *
-     * @param defaultElevation the elevation used when the [Button] is enabled, and has no other
-     * [Interaction]s.
-     * @param pressedElevation the elevation used when this [Button] is enabled and pressed.
-     * @param focusedElevation the elevation used when the [Button] is enabled and focused.
-     * @param hoveredElevation the elevation used when the [Button] is enabled and hovered.
-     * @param disabledElevation the elevation used when the [Button] is not enabled.
-     */
-    @Composable
+        @Composable
     fun buttonElevation(
         defaultElevation: Dp = 0.dp,
         pressedElevation: Dp = 0.dp,
@@ -181,13 +151,6 @@ object ButtonDefaults {
     )
 }
 
-/**
- * Represents the elevation for a button in different states.
- *
- * - See [M3ButtonDefaults.buttonElevation] for the default elevation used in a [Button].
- * - See [M3ButtonDefaults.elevatedButtonElevation] for the default elevation used in a
- * [ElevatedButton].
- */
 @Stable
 class ButtonElevation internal constructor(
     private val defaultElevation: Dp,
@@ -196,36 +159,12 @@ class ButtonElevation internal constructor(
     private val hoveredElevation: Dp,
     private val disabledElevation: Dp,
 ) {
-    /**
-     * Represents the tonal elevation used in a button, depending on its [enabled] state and
-     * [interactionSource]. This should typically be the same value as the [shadowElevation].
-     *
-     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
-     * color in light theme and lighter color in dark theme.
-     *
-     * See [shadowElevation] which controls the elevation of the shadow drawn around the button.
-     *
-     * @param enabled whether the button is enabled
-     * @param interactionSource the [InteractionSource] for this button
-     */
-    @Composable
+        @Composable
     internal fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp> {
         return animateElevation(enabled = enabled, interactionSource = interactionSource)
     }
 
-    /**
-     * Represents the shadow elevation used in a button, depending on its [enabled] state and
-     * [interactionSource]. This should typically be the same value as the [tonalElevation].
-     *
-     * Shadow elevation is used to apply a shadow around the button to give it higher emphasis.
-     *
-     * See [tonalElevation] which controls the elevation with a color shift to the surface.
-     *
-     * @param enabled whether the button is enabled
-     * @param interactionSource the [InteractionSource] for this button
-     */
-    @Composable
+        @Composable
     internal fun shadowElevation(
         enabled: Boolean,
         interactionSource: InteractionSource,
@@ -328,13 +267,6 @@ class ButtonElevation internal constructor(
     }
 }
 
-/**
- * Represents the container and content colors used in a button in different states.
- *
- * - See [M3ButtonDefaults.buttonColors] for the default colors used in a [Button].
- * - See [M3ButtonDefaults.elevatedButtonColors] for the default colors used in a [ElevatedButton].
- * - See [M3ButtonDefaults.textButtonColors] for the default colors used in a [TextButton].
- */
 @Immutable
 class ButtonColors internal constructor(
     private val containerColor: Color,
@@ -342,22 +274,12 @@ class ButtonColors internal constructor(
     private val disabledContainerColor: Color,
     private val disabledContentColor: Color,
 ) {
-    /**
-     * Represents the container color for this button, depending on [enabled].
-     *
-     * @param enabled whether the button is enabled
-     */
-    @Composable
+        @Composable
     internal fun containerColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) containerColor else disabledContainerColor)
     }
 
-    /**
-     * Represents the content color for this button, depending on [enabled].
-     *
-     * @param enabled whether the button is enabled
-     */
-    @Composable
+        @Composable
     internal fun contentColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
     }

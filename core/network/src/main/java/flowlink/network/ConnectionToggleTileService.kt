@@ -1,4 +1,4 @@
-package FlowLink.network
+﻿package FlowLink.network
 
 import android.graphics.drawable.Icon
 import android.os.Build

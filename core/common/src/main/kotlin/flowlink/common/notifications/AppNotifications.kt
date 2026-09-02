@@ -1,4 +1,4 @@
-package FlowLink.common.notifications
+﻿package FlowLink.common.notifications
 
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
@@ -10,9 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import FlowLink.common.R
 
-/**
- * Centralized notification management for the entire application
- */
 object AppNotifications {
     
     // File Transfer related constants
@@ -35,13 +32,7 @@ object AppNotifications {
     const val MEDIA_PLAYBACK_CHANNEL = "media_playback_channel"
     const val MEDIA_PLAYBACK_ID = 3001
 
-    /**
-     * Creates the notification channels introduced in Android Oreo.
-     * This won't do anything on Android versions that don't support notification channels.
-     *
-     * @param context The application context.
-     */
-    @RequiresApi(Build.VERSION_CODES.O)
+        @RequiresApi(Build.VERSION_CODES.O)
     fun createChannels(context: Context) {
         val notificationManager = NotificationManagerCompat.from(context)
 

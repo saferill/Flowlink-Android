@@ -1,4 +1,4 @@
-package FlowLink.network.util
+﻿package FlowLink.network.util
 
 import android.annotation.SuppressLint
 import android.util.Base64
@@ -20,8 +20,7 @@ import javax.net.ssl.X509TrustManager
 
 object SslHelper {
 
-    /** Our device's certificate, loaded once and reused for TLS identity and public-key helpers. */
-    val certificate: X509Certificate by lazy {
+        val certificate: X509Certificate by lazy {
         runBlocking { CryptoUtils().getOrCreateCertificate() }
     }
 
@@ -35,12 +34,7 @@ object SslHelper {
     private val secureRandom = SecureRandom()
     private val keyManagerFactory by lazy { createKeyManagerFactory() }
 
-    /**
-     * Returns a TLS SSLContext for both client and server use.
-     *
-     * @param certificate When null or empty, uses trust-all (any peer cert accepted). When set, only that certificate is trusted (client connections to paired devices).
-     */
-    fun sslContext(certificate: ByteArray? = null): SSLContext {
+        fun sslContext(certificate: ByteArray? = null): SSLContext {
         val trustManager = if (certificate != null && certificate.isNotEmpty()) {
             getTrustManager(certificate)
         } else {
@@ -97,16 +91,12 @@ object SslHelper {
         return leaf
     }
 
-    /** Our cert's public key as Base64 (for auth message and UDP broadcast). */
-    val publicKeyString: String
+        val publicKeyString: String
         get() = publicKeyString(certificate)
 
     private fun publicKeyString(cert: X509Certificate): String = Base64.encodeToString(cert.publicKey.encoded, Base64.NO_WRAP)
 
-    /**
-     * verification code from two certificates.
-     */
-    fun getVerificationCode(certificateA: Certificate, certificateB: Certificate): String {
+        fun getVerificationCode(certificateA: Certificate, certificateB: Certificate): String {
         val certsConcat = sortedConcat(certificateA.publicKey.encoded, certificateB.publicKey.encoded)
         return humanReadableHash(certsConcat)
     }

@@ -1,4 +1,4 @@
-package FlowLink.presentation.components
+﻿package FlowLink.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,13 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/**
- * @param refreshing Whether the layout is currently refreshing
- * @param onRefresh Lambda which is invoked when a swipe to refresh gesture is completed.
- * @param enabled Whether the the layout should react to swipe gestures or not.
- * @param indicatorPadding Content padding for the indicator, to inset the indicator in if required.
- * @param content The content containing a vertically scrollable composable.
- */
 @Composable
 fun PullRefresh(
     refreshing: Boolean,

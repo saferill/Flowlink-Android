@@ -1,4 +1,4 @@
-package FlowLink.network.transfer
+﻿package FlowLink.network.transfer
 
 import android.content.Context
 import android.net.Uri

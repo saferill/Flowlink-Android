@@ -1,4 +1,4 @@
-package FlowLink.common.notifications
+﻿package FlowLink.common.notifications
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -42,13 +42,6 @@ class NotificationCenter @Inject constructor(
         manager.notify(notificationId, builder.build())
     }
 }
-/**
- * Helper method to build a notification channel group.
- *
- * @param channelId the channel id.
- * @param block the function that will execute inside the builder.
- * @return a notification channel group to be displayed or updated.
- */
 fun buildNotificationChannelGroup(
     channelId: String,
     block: (NotificationChannelGroupCompat.Builder.() -> Unit),
@@ -58,15 +51,6 @@ fun buildNotificationChannelGroup(
     return builder.build()
 }
 
-
-/**
- * Helper method to build a notification channel.
- *
- * @param channelId the channel id.
- * @param channelImportance the channel importance.
- * @param block the function that will execute inside the builder.
- * @return a notification channel to be displayed or updated.
- */
 fun buildNotificationChannel(
     channelId: String,
     channelImportance: Int,

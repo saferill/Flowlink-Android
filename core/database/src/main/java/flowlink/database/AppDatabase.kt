@@ -1,4 +1,4 @@
-package FlowLink.database
+﻿package FlowLink.database
 
 import android.content.Context
 import androidx.room.Database
@@ -16,10 +16,7 @@ interface AppDatabase {
     fun devicesDao(): DeviceDao
     fun networkDao(): NetworkDao
 
-    /**
-     * Execute the whole database calls as an atomic operation
-     */
-    suspend fun <T> transaction(block: suspend () -> T): T
+        suspend fun <T> transaction(block: suspend () -> T): T
 
     companion object {
         private const val DATABASE_NAME = "FlowLink.db"
