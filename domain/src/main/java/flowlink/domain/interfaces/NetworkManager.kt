@@ -12,6 +12,7 @@ interface NetworkManager {
     fun broadcastMessage(message: SocketMessage)
     fun sendMessage(deviceId: String, message: SocketMessage)
     fun sendClipboardMessage(message: ClipboardInfo)
+    fun getActiveConnectionAddress(deviceId: String): String?
     suspend fun approveDeviceConnection(deviceId: String)
     suspend fun rejectDeviceConnection(deviceId: String)
 }

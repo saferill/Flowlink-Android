@@ -858,6 +858,10 @@ class NetworkService : Service() {
         }
     }
 
+    fun getActiveConnectionAddress(deviceId: String): String? {
+        return connections[deviceId]?.sslSocket?.inetAddress?.hostAddress
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         scope.cancel()

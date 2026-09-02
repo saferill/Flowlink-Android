@@ -21,6 +21,12 @@ class ClipboardHandler @Inject constructor(
     
     fun setClipboard(clipboard: ClipboardInfo) {
         try {
+            if (clipboard.clipboardType == "text/plain") {
+                if (clipboard.content.isEmpty() || clipboard.content == "null") return
+                if (clipboard.content == lastReceivedText) return
+                lastReceivedText = clipboard.content
+            }
+
             val clip: ClipData = when {
                 clipboard.clipboardType == "text/plain" -> ClipData.newPlainText("Received clipboard", clipboard.content)
 
@@ -55,5 +61,7 @@ class ClipboardHandler @Inject constructor(
 
     companion object {
         private const val TAG = "ClipboardHandler"
+        @Volatile
+        var lastReceivedText: String? = null
     }
 }

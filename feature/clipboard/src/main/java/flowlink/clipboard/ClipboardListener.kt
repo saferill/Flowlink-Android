@@ -6,8 +6,11 @@ import android.os.Build
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import FlowLink.clipboard.extensions.LanguageDetector
 import FlowLink.domain.interfaces.DeviceManager
 import FlowLink.domain.interfaces.NetworkManager
@@ -24,9 +27,23 @@ class ClipboardListener : AccessibilityService() {
 
     private lateinit var clipboardDetector: ClipboardDetection
 
+    private val serviceScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default + kotlinx.coroutines.SupervisorJob())
+    @Volatile
+    private var hasActiveDevice = false
+
     override fun onCreate() {
         super.onCreate()
         clipboardDetector = ClipboardDetection(LanguageDetector.getCopyForLocale(applicationContext))
+        serviceScope.launch {
+            deviceManager.pairedDevices.collect { devices ->
+                hasActiveDevice = devices.any { it.connectionState.isConnected || it.connectionState.isConnecting }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
     }
 
     private var currentPackage: CharSequence? = null
@@ -50,12 +67,7 @@ class ClipboardListener : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        val isDisconnected = runBlocking { 
-            val pairedDevices = deviceManager.pairedDevices.first()
-            // Check if any device is connected or connecting
-            !pairedDevices.any { it.connectionState.isConnected || it.connectionState.isConnecting }
-        }
-        if (isDisconnected) return
+        if (!hasActiveDevice) return
         
         try {
             if (event?.packageName != packageName)

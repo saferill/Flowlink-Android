@@ -110,7 +110,7 @@ class ReceiveFileHandler(
         
         try {
             // Send "start" message to indicate we're ready to receive this file
-            writeChannel.writeStringUtf8("start")
+            writeChannel.writeStringUtf8("start\n")
             writeChannel.flush()
             
             context.contentResolver.openOutputStream(fileUri)?.use { output ->
@@ -176,7 +176,7 @@ class ReceiveFileHandler(
                     throw IOException("Incomplete transfer: received $currentFileReceived bytes out of ${metadata.fileSize}")
                 }
 
-                writeChannel.writeStringUtf8(SendFileHandler.TRANSFER_COMPLETE_MESSAGE)
+                writeChannel.writeStringUtf8("${SendFileHandler.TRANSFER_COMPLETE_MESSAGE}\n")
                 writeChannel.flush()
             } ?: throw IOException("Failed to open output stream")
             
@@ -206,7 +206,7 @@ class ReceiveFileHandler(
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Downloads.DISPLAY_NAME, uniqueName)
                     put(MediaStore.Downloads.MIME_TYPE, metadata.mimeType)
-                    put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/FlowLink")
+                    put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/FlowLink/")
                 }
                 context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
                     ?: throw IOException("Failed to create MediaStore entry for $uniqueName")

@@ -81,7 +81,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun sendMessageToSelectedDevice(message: SocketMessage) {
-        deviceManager.selectedDeviceId.value?.let { deviceId ->
+        val targetDeviceId = deviceManager.selectedDeviceId.value
+            ?: deviceManager.pairedDevices.value.firstOrNull { it.connectionState.isConnected }?.deviceId
+        targetDeviceId?.let { deviceId ->
             networkManager.sendMessage(deviceId, message)
         }
     }

@@ -52,6 +52,18 @@ class SyncViewModel @Inject constructor(
                 val updatedDevice = device.copy(isPairing = true)
                 deviceManager.addOrUpdateDiscoveredDevice(updatedDevice)
 
+                // Ensure connection is active before sending pair message
+                withContext(Dispatchers.IO) {
+                    val targetAddresses = if (device.addresses.isNotEmpty()) device.addresses else listOf(device.address)
+                    val connectionDetails = ConnectionDetails(
+                        deviceId = device.deviceId,
+                        port = device.port ?: 5150,
+                        addresses = targetAddresses
+                    )
+                    networkManager.connectTo(connectionDetails)
+                }
+                delay(300)
+
                 networkManager.sendMessage(device.deviceId, PairMessage(true))
 
                 // Watch for device to disappear from discoveredDevices or isPairing to become false
@@ -100,6 +112,33 @@ class SyncViewModel @Inject constructor(
                 pair(device, rootNavController)
             } catch (e: Exception) {
                 Log.e(TAG, "Error connecting from QR code", e)
+            }
+        }
+    }
+
+    fun connectDirectIp(ip: String, rootNavController: NavController) {
+        viewModelScope.launch {
+            try {
+                _isRefreshing.value = true
+                val cleanIp = ip.trim()
+                val connectionDetails = ConnectionDetails(
+                    deviceId = cleanIp,
+                    port = 5150,
+                    addresses = listOf(cleanIp)
+                )
+                withContext(Dispatchers.IO) {
+                    networkManager.connectTo(connectionDetails)
+                }
+                delay(1.seconds)
+                val device = discoveredDevices.value[cleanIp] 
+                    ?: discoveredDevices.value.values.firstOrNull { it.address == cleanIp || it.addresses.contains(cleanIp) }
+                if (device != null) {
+                    pair(device, rootNavController)
+                }
+                _isRefreshing.value = false
+            } catch (e: Exception) {
+                Log.e(TAG, "Error connecting to direct IP $ip", e)
+                _isRefreshing.value = false
             }
         }
     }

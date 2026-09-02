@@ -190,7 +190,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.help),
                     icon = ImageVector.vectorResource(R.drawable.ic_help_fill),
                     onPreferenceClick = {
-                        uriHandler.openUri("https://github.com/safe_rill/Sekia/blob/master/README.MD")
+                        uriHandler.openUri("https://github.com/safe_rill/FlowLink/blob/master/README.md")
                     }
                 )
         }

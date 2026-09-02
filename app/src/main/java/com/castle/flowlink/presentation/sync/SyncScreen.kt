@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -57,6 +58,50 @@ fun SyncScreen(
     
     val qrConnectionData by savedStateHandle?.getStateFlow<QrCodeConnectionData?>("qr_code_result", null)
         ?.collectAsState() ?: remember { mutableStateOf(null) }
+
+    var showDirectIpDialog by remember { mutableStateOf(false) }
+
+    if (showDirectIpDialog) {
+        var inputIp by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showDirectIpDialog = false },
+            title = { Text("Hubungkan via IP / Tailscale") },
+            text = {
+                Column {
+                    Text(
+                        text = "Masukkan IP Tailscale laptop Anda (misal: 100.106.129.41):",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    OutlinedTextField(
+                        value = inputIp,
+                        onValueChange = { inputIp = it },
+                        label = { Text("IP Address") },
+                        placeholder = { Text("100.x.x.x") },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    enabled = inputIp.isNotBlank(),
+                    onClick = {
+                        showDirectIpDialog = false
+                        viewModel.connectDirectIp(inputIp, rootNavController)
+                    }
+                ) {
+                    Text("Hubungkan")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDirectIpDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 
     // QR Code Connection Dialog
     qrConnectionData?.let { connectionData ->
@@ -143,6 +188,14 @@ fun SyncScreen(
                     },
                     actions = {
                         IconButton(
+                            onClick = { showDirectIpDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Hubungkan via IP"
+                            )
+                        }
+                        IconButton(
                             onClick = {
                                 rootNavController.navigate(SyncRoute.QrCodeScannerScreen.route)
                             }
@@ -173,6 +226,13 @@ fun SyncScreen(
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
+
+                TextButton(
+                    onClick = { showDirectIpDialog = true },
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("🔗 Hubungkan Langsung via IP / Tailscale")
+                }
 
 
                 when {

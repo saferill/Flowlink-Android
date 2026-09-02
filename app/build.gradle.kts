@@ -14,8 +14,8 @@ android {
     defaultConfig {
         applicationId = "com.castle.FlowLink"
 
-        versionCode = 28
-        versionName = "2.5.3"
+        versionCode = 1
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -24,11 +24,24 @@ android {
         includeInBundle = false
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("flowlink-release.jks")
+            storePassword = "flowlink123"
+            keyAlias = "flowlink"
+            keyPassword = "flowlink123"
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+            enableV4Signing = true
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

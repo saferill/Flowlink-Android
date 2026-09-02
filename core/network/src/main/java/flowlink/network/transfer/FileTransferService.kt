@@ -83,16 +83,37 @@ class FileTransferService @Inject constructor(
                 val device = deviceManager.getPairedDevice(deviceId)
                     ?: throw IOException("Device $deviceId not found")
 
-                val address = device.address 
-                    ?: throw IOException("No connected address for device $deviceId")
+                val candidateAddresses = buildList {
+                    networkManager.getActiveConnectionAddress(deviceId)?.let { add(it) }
+                    device.address?.let { if (!contains(it)) add(it) }
+                    device.getAddressesToTry().forEach { if (!contains(it)) add(it) }
+                }
 
-                val clientSocket = socketFactory.tcpClientSocket(address, transfer.serverInfo.port, device.certificate)
-                    ?: throw IOException("Failed to establish connection")
+                if (candidateAddresses.isEmpty()) {
+                    throw IOException("No connected address for device $deviceId")
+                }
+
+                var clientSocket: javax.net.ssl.SSLSocket? = null
+                for (addr in candidateAddresses) {
+                    try {
+                        Log.d(TAG, "Attempting file transfer connection to $addr:${transfer.serverInfo.port}")
+                        clientSocket = socketFactory.tcpClientSocket(addr, transfer.serverInfo.port, device.certificate)
+                        if (clientSocket != null) {
+                            Log.d(TAG, "Connected to file transfer server at $addr:${transfer.serverInfo.port}")
+                            break
+                        }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed connection attempt to $addr:${transfer.serverInfo.port}: ${e.message}")
+                    }
+                }
+
+                val connectedSocket = clientSocket 
+                    ?: throw IOException("Failed to establish connection to any candidate address: $candidateAddresses")
 
                 val handler = ReceiveFileHandler(
                     context = context,
                     transferId = transferId,
-                    clientSocket = clientSocket,
+                    clientSocket = connectedSocket,
                     files = transfer.files,
                     deviceName = device.deviceName,
                     preferencesRepository = if (transfer.isClipboard) null else preferencesRepository,

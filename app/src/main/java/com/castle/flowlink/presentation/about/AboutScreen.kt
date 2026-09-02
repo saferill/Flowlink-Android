@@ -60,10 +60,20 @@ fun AboutScreen(rootNavController: NavController, modifier: Modifier = Modifier)
 
             item {
                 TextPreferenceWidget(
+                    title = "Developer",
+                    subtitle = "saferill",
+                    onPreferenceClick = {
+                        // Developer info
+                    },
+                )
+            }
+
+            item {
+                TextPreferenceWidget(
                     title = stringResource(R.string.version),
                     subtitle = BuildConfig.VERSION_NAME,
                     onPreferenceClick = {
-                        // TODO
+                        // Version
                     },
                 )
             }
@@ -81,43 +91,16 @@ fun AboutScreen(rootNavController: NavController, modifier: Modifier = Modifier)
             }
 
             item {
-                TextPreferenceWidget(
-                    title = stringResource(R.string.whats_new),
-                    onPreferenceClick = { uriHandler.openUri("https://github.com/PLACEHOLDER/FlowLink-Android/releases") },
-                )
-            }
-
-            item {
-                TextPreferenceWidget(
-                    title = stringResource(R.string.windows_app),
-                    onPreferenceClick = { uriHandler.openUri("https://github.com/PLACEHOLDER/FlowLink") },
-                )
-            }
-
-
-            item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     LinkIcon(
-                        label = "Discord",
-                        icon = CustomIcons.Discord,
-                        url = "https://discord.gg/MuvMqv4MES",
-                    )
-
-                    LinkIcon(
                         label = "GitHub",
                         icon = CustomIcons.Github,
-                        url = "https://github.com/PLACEHOLDER/FlowLink-Android",
-                    )
-
-                    LinkIcon(
-                        label = "Donation",
-                        icon = Icons.Default.AttachMoney,
-                        url = "https://linktr.ee/safe_rill",
+                        url = "https://github.com/safe_rill",
                     )
                 }
             }

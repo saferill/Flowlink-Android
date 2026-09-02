@@ -158,6 +158,7 @@ class NetworkDiscovery @Inject constructor(
 
         val networkRequest = NetworkRequest.Builder()
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
             .build()
 
         try {

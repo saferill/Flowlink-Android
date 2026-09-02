@@ -14,6 +14,8 @@ object NetworkHelper {
     // See: https://android.googlesource.com/kernel/msm/+/android-msm-flo-3.4-kitkat-mr1/Documentation/usb/gadget_rmnet.txt
     fun getDeviceIpAddress(): InetAddress? {
         var fallbackIp: InetAddress? = null
+        var tailscaleIp: InetAddress? = null
+        var wifiIp: InetAddress? = null
         try {
             val interfaces = Collections.list(NetworkInterface.getNetworkInterfaces())
             for (networkInterface in interfaces) {
@@ -23,17 +25,21 @@ object NetworkHelper {
                 for (inetAddress in Collections.list(networkInterface.inetAddresses)) {
                     if (inetAddress.isLoopbackAddress) continue
                     if (inetAddress is Inet4Address) {
-                        return inetAddress
-                    }
-                    if (fallbackIp == null) {
-                        fallbackIp = inetAddress
+                        val host = inetAddress.hostAddress ?: ""
+                        if (isTailscaleAddress(host)) {
+                            tailscaleIp = inetAddress
+                        } else if (networkInterface.name.startsWith("wlan")) {
+                            wifiIp = inetAddress
+                        } else if (fallbackIp == null) {
+                            fallbackIp = inetAddress
+                        }
                     }
                 }
             }
         } catch (_: SocketException) {
         }
 
-        return fallbackIp
+        return tailscaleIp ?: wifiIp ?: fallbackIp
     }
 
     fun getAllDeviceIpAddresses(): List<String> {

@@ -58,6 +58,10 @@ class NetworkManagerImpl @Inject constructor(
         networkService?.sendClipboardMessage(message)
     }
 
+    override fun getActiveConnectionAddress(deviceId: String): String? {
+        return networkService?.getActiveConnectionAddress(deviceId)
+    }
+
     override suspend fun approveDeviceConnection(deviceId: String) {
         networkService?.approveDeviceConnection(deviceId)
     }

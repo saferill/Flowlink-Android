@@ -26,13 +26,19 @@ class ClipboardChangeActivity : FragmentActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         lifecycleScope.launch {
-            /** Seems like adding a delay is giving [ClipboardManager] time to capture
-             *  clipboard text.
-             */
-            delay(500)
+            delay(250)
             if (hasFocus) {
-                val data = clipboardManager.primaryClip?.getItemAt(0)?.text.toString()
-                networkManager.sendClipboardMessage(ClipboardInfo("text/plain", data))
+                val clip = clipboardManager.primaryClip
+                if (clip != null && clip.itemCount > 0) {
+                    val text = clip.getItemAt(0)?.text?.toString()
+                    if (!text.isNullOrBlank() && 
+                        text != "null" && 
+                        text != ClipboardHandler.lastReceivedText && 
+                        text != lastSentText) {
+                        lastSentText = text
+                        networkManager.sendClipboardMessage(ClipboardInfo("text/plain", text))
+                    }
+                }
                 finish()
             }
         }
@@ -49,6 +55,9 @@ class ClipboardChangeActivity : FragmentActivity() {
     }
 
     companion object {
+        @Volatile
+        var lastSentText: String? = null
+
         fun launch(context: Context) = with(context) {
             val intent = Intent(this, ClipboardChangeActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
