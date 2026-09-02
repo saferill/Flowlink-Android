@@ -34,3 +34,4 @@ interface DeviceManager {
     suspend fun removePairedDevice(deviceId: String)
 }
 
+
